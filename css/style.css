@@ -1,0 +1,165 @@
+body{
+    text-align: right;
+    font-family: koodakb;
+}
+input{
+    border: 1px solid black;
+}
+
+#link{
+    font-family: "b homa";
+    padding: 5px;
+    border: 1px;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+}
+
+.required{
+    color: red;
+    /*padding-left: 10px;*/
+    /*width: 20px;*/
+
+}
+/*input:required{*/
+/*width: calc(100% - 20px) !important;*/
+/*}*/
+
+.reagentType{
+    display: none;
+}
+
+.invalid{
+    text-decoration: line-through;
+    text-decoration-color: red;
+}
+.container{
+    padding-top: 50px;
+}
+
+#drop_file_zone {
+    background-color: #EEE;
+    border: #999 5px dashed;
+    padding: 8px;
+    font-size: 18px;
+}
+#drag_upload_file {
+    width:100%;
+    margin:0 auto;
+}
+#drag_upload_file p {
+    text-align: center;
+}
+#drag_upload_file #selectfile {
+    display: none;
+}
+
+
+.sidebar {
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+
+}
+
+.sidebar a {
+    font-family: koodakb;
+    display: block;
+    color: black;
+    padding: 16px;
+    text-decoration: none;
+}
+
+.sidebar a.active {
+    background-color: #562a77;
+    color: white;
+
+}
+
+.sidebar a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+}
+
+div.content {
+    overflow-x: auto;
+    margin-right: 200px;
+    padding: 1px 16px;
+}
+
+.pagination{
+    text-align: center;
+}
+
+.pagination a {
+    text-align: center;
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    line-height: 1em;
+}
+
+.pagination a.active {
+    background-color: #562a77;
+    color: white;
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}
+
+@media screen and (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        display: -ms-flexbox !important;
+        display: flex !important
+    }
+    .sidebar a {float: left;}
+    div.content {margin-right: 0;}
+}
+
+@media screen and (max-width: 400px) {
+    .sidebar a {
+        text-align: center;
+        float: none;
+    }
+}
+
+@font-face {
+    font-family: lotus;
+    src: url(../fonts/BLOTUS.TTF);
+}
+@font-face {
+    font-family: lotus;
+    src: url(../fonts/BLOTUSB.TTF);
+    font-weight: bold;
+}
+@font-face {
+    font-family: koodakb;
+    src: url(../fonts/BKOODB.TTF);
+    font-weight: bold;
+}
+@font-face {
+    font-family: khorasan;
+    src: url(../fonts/irkhorasan.ttf);
+    font-weight: bold;
+}
+@font-face {
+    font-family: nazanin;
+    src: url(../fonts/BNAZANIN.TTF);
+}
+@font-face {
+    font-family: nazanin;
+    src: url(../fonts/BNAZANB.TTF);
+    font-weight: bold;
+}
+@font-face {
+    font-family: btitr;
+    src: url(../fonts/BTITRBD.TTF);
+}
