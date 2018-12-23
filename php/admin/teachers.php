@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
+if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
 ?>
 <!DOCTYPE html>
@@ -57,7 +57,7 @@ include("sidebar_admin.php");
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row text-center' data-href='teacher.php?mail=" . $row["email"] . "'>";
+            echo "<tr class='clickable-row text-center' data-href='teacher_courselist.php?mail=" . $row["email"] . "'>";
             echo "<td>" . $row["name"] . " " . $row["family"] . "</td>" . "<td>" . $row["email"] . "</td>" . "<td>" . $row["phoneNum"] . "</td>" . "<td>" ;
             if($row['title'] != "") echo '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">' . $row['title'] . '</a>' ;
             echo "</td>";

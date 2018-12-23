@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 $db = @mysqli_connect("localhost", "root", "", "ebbroker");
@@ -45,7 +45,7 @@ if (!mysqli_connect_error()) {
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
@@ -109,18 +109,13 @@ include("sidebar_admin.php");
         </div>
         <div class="form-group">
             <label for="teacher">استاد:</label>
-            <select class="form-control" name="teacher" id="teacher">
-
-                <?php
+            <div name="teacher" id="teacher"><?php
                 mysqli_query($db, "SET NAMES utf8");
-                $sql = "SELECT name, family, email FROM teachers";
+                $sql = "SELECT name, family FROM teachers where email = '" . $_SESSION['temail'] . "'";
                 $result = mysqli_query($db, $sql);
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<option value='" . $row['email'] . "'>" . $row['name'] . " " . $row['family'] . "</option>";
-                }
-                ?>
-
-            </select>
+                $row = mysqli_fetch_assoc($result);
+                echo $row['name'] . " " . $row['family'];
+                ?></div>
         </div>
 
         <button type="submit" class="btn btn-primary" name="submit" value="login">افزودن</button>

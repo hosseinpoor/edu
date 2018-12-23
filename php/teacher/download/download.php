@@ -8,7 +8,7 @@
 
 session_start();
 
-if (isset($_SESSION['aemail']) && !empty($_SESSION['aemail'])) {
+if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
     $db = @mysqli_connect("localhost", "root", "", "ebbroker");
 
     function download($name)

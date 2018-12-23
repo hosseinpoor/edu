@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 ?>
 <!DOCTYPE html>
@@ -10,7 +10,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>پنل مدیریت</title>
+    <title>پنل اساتید</title>
 
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -33,7 +33,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 

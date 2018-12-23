@@ -64,7 +64,11 @@ input{
 #drag_upload_file #selectfile {
     display: none;
 }
-
+.logout-date{
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
 
 .sidebar {
     margin: 0;
@@ -124,6 +128,9 @@ div.content {
 .pagination a:hover:not(.active) {background-color: #ddd;}
 
 @media screen and (max-width: 700px) {
+    .logout-date{
+        display: none;
+    }
     .sidebar {
         width: 100%;
         height: auto;

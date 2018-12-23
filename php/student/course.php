@@ -269,11 +269,11 @@ session_start();
     echo "ظرفیت : " . $row['capacity'] . "<br>";
     echo "سرفصل ها : " . $row['topicText'] . "<br>";
     if ($row["topicFile"] != Null)
-        echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info" role="button">فایل سرفصل ها</a> ';
+        echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="'.$row['topicFileName'].'">فایل سرفصل ها</a> ';
     else
         echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
     if ($row["brochureFile"] != Null)
-        echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info" role="button">فایل بروشور</a>' . "<br>";
+        echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="'.$row['brochureFileName'].'">فایل بروشور</a>' . "<br>";
     else
         echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
     echo "<br>";

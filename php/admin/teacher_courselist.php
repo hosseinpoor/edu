@@ -1,8 +1,10 @@
 <?php
 // Start the session
 session_start();
+
 if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,8 +12,26 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>پنل مدیریت</title>
-
+    <title><?php
+        if (isset($_GET['mail']) && !empty($_GET['mail'])) {
+            $db = @mysqli_connect("localhost", "root", "", "ebbroker");
+            if (!mysqli_connect_error()) {
+                mysqli_query($db, "SET NAMES utf8");
+                $sql = "SELECT family FROM teachers WHERE email = '" . $_GET['mail'] . "'";
+                $result = mysqli_query($db, $sql);
+                if (mysqli_num_rows($result) > 0) {
+                    $row = mysqli_fetch_assoc($result);
+                    echo $row['family'];
+                } else {
+                    header("location:teachers.php");
+                }
+            } else {
+                header("location:teachers.php");
+            };
+        } else {
+            header("location:teachers.php");
+        }
+        ?></title>
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../../css/jquery.Bootstrap-PersianDateTimePicker.css"/>
@@ -26,16 +46,13 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     <script src="../../js/jquery.Bootstrap-PersianDateTimePicker.js" type="text/javascript"></script>
     <script src="../../ckeditor/ckeditor.js"></script>
     <script src="../../ckeditor/samples/js/sample.js"></script>
-
 </head>
 
 <body dir="rtl">
 
-
 <?php
 include("sidebar_admin.php");
 ?>
-
 
 <div class="content">
 
@@ -80,13 +97,20 @@ include("sidebar_admin.php");
         return $total;
     }
 
-
-    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
+    echo "<div class='mt-5'><a class='namelink' href='teacher.php?mail=".$_GET['mail']."'>";
+    $sql = "SELECT family FROM teachers WHERE email = '" . $_GET['mail'] . "'";
     $result = mysqli_query($db, $sql);
-    echo "<h1 class='text-right'>پنل مدیریت</h1>";
-    echo "<span class='text-right'>لیست تمام دروس</span>";
-    echo '<a href="new_course.php" class="btn btn-success float-left" role="button">درس جدید</a>';
-    echo '<a href="download/allcourses_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        echo $row['family'];
+    } else {
+        header("location:teachers.php");
+    }
+    echo "</a></div>";
+    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email AND teacherMail = '".$_GET['mail']."' ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
+    $result = mysqli_query($db, $sql);
+    echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
+    echo '<a href="download/teachercourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
     echo "<table class='table table-striped table-bordered table-hover mt-3'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 15%'>عنوان</th> <th style='width: 15%'>استاد</th> <th style='width: 15%'>روز های برگزاری</th> <th style='width: 15%'>هزینه</th> <th style='width: 15%'>تعداد ثبت نامی</th> <th style='width: 15%'>مبلغ کل ثبت نام</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
@@ -109,7 +133,7 @@ include("sidebar_admin.php");
 
     <?php
     include("pager.php");
-    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  ";
+    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email AND teacherMail = '".$_GET['mail']."'";
     createPager($sql, $db);
     ?>
 

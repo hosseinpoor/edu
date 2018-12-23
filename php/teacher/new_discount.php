@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 $db = @mysqli_connect("localhost", "root", "", "ebbroker");
@@ -45,7 +45,7 @@ if (!mysqli_connect_error()) {
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
@@ -61,7 +61,7 @@ include("sidebar_admin.php");
             <select class="form-control" name="course" id="course">
 
                 <?php
-                $sql = "SELECT title, courseId FROM course";
+                $sql = "SELECT title, courseId FROM course WHERE teacherMail = '".$_SESSION['temail']."'";
                 $result = mysqli_query($db, $sql);
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<option value='" . $row['courseId'] . "'>" . $row['title'] . "</option>";

@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 ?>
 <!DOCTYPE html>
@@ -10,7 +10,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>پنل مدیریت</title>
+    <title>پنل اساتید</title>
 
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -33,7 +33,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 
@@ -81,10 +81,10 @@ include("sidebar_admin.php");
     }
 
 
-    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
+    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email AND email = '".$_SESSION['temail']."'  ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
-    echo "<h1 class='text-right'>پنل مدیریت</h1>";
-    echo "<span class='text-right'>لیست تمام دروس</span>";
+    echo "<h1 class='text-right'>پنل اساتید</h1>";
+    echo "<span class='text-right'>لیست دروس شما</span>";
     echo '<a href="new_course.php" class="btn btn-success float-left" role="button">درس جدید</a>';
     echo '<a href="download/allcourses_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
     echo "<table class='table table-striped table-bordered table-hover mt-3'>";
@@ -109,7 +109,7 @@ include("sidebar_admin.php");
 
     <?php
     include("pager.php");
-    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  ";
+    $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  AND email = '".$_SESSION['temail']."'";
     createPager($sql, $db);
     ?>
 

@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 $db = @mysqli_connect("localhost", "root", "", "ebbroker");
@@ -22,7 +22,7 @@ if (!mysqli_connect_error()) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>پنل مدیریت</title>
+    <title>پنل اساتید</title>
 
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -44,7 +44,7 @@ if (!mysqli_connect_error()) {
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
@@ -58,9 +58,15 @@ include("sidebar_admin.php");
             return 0;
     }
 
-    $sql = "SELECT * FROM discount ORDER BY discountId DESC LIMIT 10 OFFSET " . getOffset();
+    $sql = "SELECT courseId from course WHERE teacherMail = '".$_SESSION['temail']."'";
     $result = mysqli_query($db, $sql);
-    echo "<h1 class='text-right'>پنل مدیریت</h1>";
+    while($row = mysqli_fetch_assoc($result)){
+        $courses[] = $row['courseId'];
+    }
+
+    $sql = "SELECT * FROM discount WHERE courseId IN (".implode(",",$courses).") ORDER BY discountId DESC LIMIT 10 OFFSET " . getOffset();
+    $result = mysqli_query($db, $sql);
+    echo "<h1 class='text-right'>پنل اساتید</h1>";
     echo "<span class='text-right'>لیست تخفیف ها</span>";
     echo '<a href="new_discount.php" class="btn btn-success float-left" role="button">تخفیف جدید</a>';
     echo '<a href="download/discounts_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';

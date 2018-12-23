@@ -2,7 +2,7 @@
 // Start the session
 session_start();
 
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 ?>
@@ -13,23 +13,23 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?php
-        if (isset($_GET['mail']) && !empty($_GET['mail'])) {
+        if (isset($_GET['id']) && !empty($_GET['id'])) {
             $db = @mysqli_connect("localhost", "root", "", "ebbroker");
             if (!mysqli_connect_error()) {
                 mysqli_query($db, "SET NAMES utf8");
-                $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+                $sql = "SELECT title FROM course WHERE courseId = " . $_GET['id'];
                 $result = mysqli_query($db, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     $row = mysqli_fetch_assoc($result);
-                    echo $row['family'];
+                    echo $row['title'];
                 } else {
-                    header("location:students.php");
+                    header("location:courses.php");
                 }
             } else {
-                header("location:students.php");
+                header("location:courses.php");
             };
         } else {
-            header("location:students.php");
+            header("location:courses.php");
         }
         ?></title>
     <link rel="stylesheet" href="../../css/bootstrap.min.css">
@@ -51,7 +51,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
@@ -84,31 +84,38 @@ include("sidebar_admin.php");
         }
         return $cost;
     }
-    echo "<div class='mt-5'><a class='namelink' href='student.php?mail=".$_GET['mail']."'>";
-    $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+
+
+    $cost = 0;
+    echo "<h1 class='text-right'>لیست دانشجویان</h1>";
+    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
+    $sql = "SELECT title , cost FROM course WHERE courseId = " . $_GET['id'];
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
-        echo $row['family'];
+        echo "<div class='text-right p-2'>افراد ثبت نام کرده در " . $row['title'] . "</div>";
+        $cost = $row['cost'];
     } else {
-        header("location:students.php");
+        echo "<div class='text-right p-2'>افراد ثبت نام کرده در کلاس</div>";
     }
-    echo "</a></div>";
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId  ORDER BY course.courseId DESC LIMIT 10 OFFSET " . getOffset();
+
+
+    $sql = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
-    echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
-    echo '<a href="download/studentcourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
-    echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
+    echo "<table class='table table-striped table-bordered table-hover'>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th>مبلغ پرداختی</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row text-center' data-href='edit_course.php?id=" . $row["courseId"] . "'>";
-            echo "<td>" . $row["title"] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" ."<td>" . getPay($row['discountId'], $db, $row['cost']) . "</td>". "<td>" .
-                '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">لیست دانشجویان</a>'
-                . "</td>";
-            echo "</tr>";
+            $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
+            $r = mysqli_query($db, $s);
+            while ($crow = mysqli_fetch_assoc($r)) {
+                echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . $row["studentMail"] . "'>";
+                echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
+                echo "</tr>";
+            }
         }
+
     } else {
         echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
@@ -116,11 +123,12 @@ include("sidebar_admin.php");
     }
     echo "</tbody>";
     echo "</table>";
+
     ?>
 
     <?php
     include("pager.php");
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
+    $sql = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id'];
     createPager($sql , $db);
     ?>
 

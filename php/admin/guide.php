@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
+if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
 ?>
 <!DOCTYPE html>

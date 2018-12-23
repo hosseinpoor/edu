@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (empty($_SESSION['aemail']))
+if (empty($_SESSION['temail']))
     header("location:../login.php");
 
 $brochurePath = "";
@@ -53,11 +53,10 @@ $holdingDays_unsafe = test_input($_POST['holdingDays']);
 $cost_unsafe = test_input($_POST['cost']);
 $capacity_unsafe = test_input($_POST['cap']);
 $topictext_unsafe = test_input($_POST['topicText']);
-$teacher_unsafe = test_input($_POST['teacher']);
 
 if (isset($_POST["submit"])) {
 
-    if (!empty($title_unsafe) && !empty($description_unsafe) && !empty($teacher_unsafe)) {
+    if (!empty($title_unsafe) && !empty($description_unsafe)) {
 
         if (file_exists($_FILES['brochureFile']['tmp_name']) || is_uploaded_file($_FILES['brochureFile']['tmp_name'])) {
 
@@ -112,7 +111,6 @@ if (isset($_POST["submit"])) {
             $cost = mysqli_real_escape_string($db, $cost_unsafe);
             $capacity = mysqli_real_escape_string($db, $capacity_unsafe);
             $topictext = mysqli_real_escape_string($db, $topictext_unsafe);
-            $teacher = mysqli_real_escape_string($db, $teacher_unsafe);
             $brochurePath = mysqli_real_escape_string($db, $brochurePath);
             $titlePath = mysqli_real_escape_string($db, $titlePath);
 
@@ -131,19 +129,19 @@ if (isset($_POST["submit"])) {
             mysqli_query($db, $sql);
 
             $query = "insert into course (title,description,startDate,endDate,holdingDays,cost,capacity,topicText,topicFile ,topicFileName , brochureFileName ,brochureFile,teacherMail) values
-                            ('$title','$description',$startDate,$endDate,$holdingDays,$cost,$capacity,$topictext,$titlePath,$titleName,$brochureName,$brochurePath,'$teacher')";
+                            ('$title','$description',$startDate,$endDate,$holdingDays,$cost,$capacity,$topictext,$titlePath,$titleName,$brochureName,$brochurePath,'".$_SESSION['temail']."')";
 
             $result = mysqli_query($db, $query);
 
             if ($result > 0)
                 echo "<script>
                     alert('new course added');
-                    window.location.href='admin.php';
+                    window.location.href='courses.php';
                     </script>";
             else
                 echo "<script>
                     alert('error in adding new course');
-                    window.location.href='admin.php';
+                    window.location.href='courses.php';
                     </script>";
 
             mysqli_close($db);
@@ -151,15 +149,15 @@ if (isset($_POST["submit"])) {
         } else {
             echo "<script>
                     alert('error in connecting to DB. please try again later');
-                    window.location.href='admin.php';
+                    window.location.href=courses.php;
                     </script>";
         }
 
     } else
-        header("location:admin.php");
+        header("location:courses.php");
 
 } else {
-    header("location:admin.php");
+    header("location:courses.php");
 }
 
 ?>

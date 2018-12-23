@@ -17,7 +17,7 @@
     if (!mysqli_connect_error()) {
         mysqli_query($db, "SET NAMES utf8");
         $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-        $sql = "SELECT * FROM adminmenu ORDER BY priority , id";
+        $sql = "SELECT * FROM teachermenu ORDER BY priority , id";
         $result = mysqli_query($db, $sql);
         while ($row = mysqli_fetch_assoc($result)) {
             if (strpos($actual_link, $row['link']))

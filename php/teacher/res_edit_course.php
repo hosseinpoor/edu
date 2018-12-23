@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 $brochurePath = "";
@@ -33,12 +33,11 @@ $holdingDays_unsafe = test_input($_POST['holdingDays']);
 $cost_unsafe = test_input($_POST['cost']);
 $capacity_unsafe = test_input($_POST['cap']);
 $topictext_unsafe = test_input($_POST['topicText']);
-$teacher_unsafe = test_input($_POST['teacher']);
 $courseId = test_input($_GET['id']);
 
 if (isset($_POST["submit"])) {
 
-    if (!empty($title_unsafe) && !empty($description_unsafe) && !empty($teacher_unsafe)) {
+    if (!empty($title_unsafe) && !empty($description_unsafe)) {
 
         $db = @mysqli_connect("localhost", "root", "", "ebbroker");
 
@@ -107,7 +106,6 @@ if (isset($_POST["submit"])) {
             $cost = mysqli_real_escape_string($db, $cost_unsafe);
             $capacity = mysqli_real_escape_string($db, $capacity_unsafe);
             $topictext = mysqli_real_escape_string($db, $topictext_unsafe);
-            $teacher = mysqli_real_escape_string($db, $teacher_unsafe);
             $brochurePath = mysqli_real_escape_string($db, $brochurePath);
             $titlePath = mysqli_real_escape_string($db, $titlePath);
 
@@ -135,7 +133,7 @@ if (isset($_POST["submit"])) {
                                 brochureFile = $brochurePath ,
                                 topicFileName = $titleName,
                                 brochureFileName = $brochureName,
-                                teacherMail = '$teacher'
+                                teacherMail = '".$_SESSION['temail']."'
                                 WHERE courseId = $courseId";
 
             $result = mysqli_query($db, $sql);
@@ -143,7 +141,7 @@ if (isset($_POST["submit"])) {
             if ($result > 0)
                 echo "<script>
                     alert('the course updated');
-                    window.location.href='admin.php';
+                    window.location.href='courses.php';
                     </script>";
             else
                 echo "<script>

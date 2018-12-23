@@ -2,7 +2,7 @@
 // Start the session
 session_start();
 
-if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
+if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
 
 ?>
@@ -110,7 +110,7 @@ include("sidebar_admin.php");
             $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
             $r = mysqli_query($db, $s);
             while ($crow = mysqli_fetch_assoc($r)) {
-                echo "<tr class='clickable-row text-center' data-href='student.php?mail=" . $row["studentMail"] . "'>";
+                echo "<tr class='clickable-row text-center' data-href='student_courses.php?mail=" . $row["studentMail"] . "'>";
                 echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
                 echo "</tr>";
             }

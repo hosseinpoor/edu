@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (empty($_SESSION['aemail']))
+if (empty($_SESSION['temail']))
     header("location:../login.php");
 ?>
 
@@ -41,7 +41,7 @@ if (empty($_SESSION['aemail']))
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content p-5">

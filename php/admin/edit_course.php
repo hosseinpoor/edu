@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (empty($_SESSION['temail']))
+if (empty($_SESSION['aemail']))
     header("location:../login.php");
 if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
     $db = @mysqli_connect("localhost", "root", "", "ebbroker");

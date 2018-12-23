@@ -1,7 +1,7 @@
 <?php
 // Start the session
 session_start();
-if (empty($_SESSION['aemail']))
+if (empty($_SESSION['temail']))
     header("location:../login.php");
 if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
     $db = @mysqli_connect("localhost", "root", "", "ebbroker");
@@ -23,13 +23,13 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
             $code = $row['code'];
 
         } else {
-            header("location:admin.php");
+            header("location:courses.php");
         }
     } else {
-        header("location:admin.php");
+        header("location:courses.php");
     };
 } else {
-    header("location:admin.php");
+    header("location:courses.php");
 }
 ?>
 <!DOCTYPE html>
@@ -58,7 +58,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
@@ -72,7 +72,7 @@ include("sidebar_admin.php");
             <select class="form-control" name="course" id="course">
 
                 <?php
-                $sql = "SELECT title, courseId FROM course";
+                $sql = "SELECT title, courseId FROM course WHERE teacherMail = '".$_SESSION['temail']."'";
                 $result = mysqli_query($db, $sql);
                 while ($row = mysqli_fetch_assoc($result)) {
                     if ($row['courseId'] == $courseId)

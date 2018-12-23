@@ -2,7 +2,7 @@
 // Start the session
 session_start();
 
-if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
+if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
 ?>
@@ -51,19 +51,12 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 <body dir="rtl">
 
 <?php
-include("sidebar_admin.php");
+include("sidebar_teacher.php");
 ?>
 
 <div class="content">
 
     <?php
-    function getOffset()
-    {
-        if (isset($_GET['page']) && !empty($_GET['page']) && $_GET['page'] > 0) {
-            return ($_GET['page'] - 1) * 10;
-        } else
-            return 0;
-    }
     function getPay($id, $db, $cost)
     {
         if ($id != Null) {
@@ -94,10 +87,10 @@ include("sidebar_admin.php");
         header("location:students.php");
     }
     echo "</a></div>";
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId  ORDER BY course.courseId DESC LIMIT 10 OFFSET " . getOffset();
+    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
     $result = mysqli_query($db, $sql);
     echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
-    echo '<a href="download/studentcourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
+    echo '<a href="download/studentcourses_download.php?mail='.$_GET['mail'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
     echo "<table class='table table-striped table-bordered table-hover mt-3'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
@@ -116,12 +109,6 @@ include("sidebar_admin.php");
     }
     echo "</tbody>";
     echo "</table>";
-    ?>
-
-    <?php
-    include("pager.php");
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
-    createPager($sql , $db);
     ?>
 
 

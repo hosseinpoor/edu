@@ -80,13 +80,13 @@ if (isset($_POST['submit'])) {
                     switch ($row['role']) {
                         case 2:
                             session_start();
-                            $_SESSION["temail"] = $email;
+                            $_SESSION["aemail"] = $email;
                             header("location:admin/admin.php");
                             break;
                         case 3:
                             session_start();
                             $_SESSION["temail"] = $email;
-                            header("location:admin/admin.php");
+                            header("location:teacher/courses.php");
                             break;
                         case 5:
                             session_start();
