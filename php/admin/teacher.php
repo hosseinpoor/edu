@@ -55,8 +55,17 @@ include("sidebar_admin.php");
     echo "نام پدر : " . $row['dadsName'] . "<br>";
     echo "تلفن همراه : " . $row['phoneNum'] . "<br>";
     echo "تلفن ثابت : " . $row['landlineNum'] . "<br>";
-    echo "میزان تحصیلات : " . $row['education'] . "<br>";
     echo "رایانامه : " . $row['email'] . "<br>";
+    echo "میزان تحصیلات : " . $row['education'] . "<br>";
+    echo "استان : " . $row['province'] . "<br>";
+    echo "آدرس محل سکونت : " . $row['address'] . "<br>";
+    echo "شهر تولد : " . $row['birthCity'] . "<br>";
+    echo "تاریخ تولد : " . str_replace('-' , '/' , $row['birthDay']) . "<br>";
+    if(!empty($row['image'])){
+        echo "<img src='../../".$row['image']."' />";
+    }
+
+
     ?>
 
 </div>
