@@ -9,7 +9,7 @@ function createPager($sql, $db)
             $page = intval($_GET['page']);
         ?>
 
-        <div style="text-align: center">
+        <div class="text-center">
             <div class="pagination">
 
                 <a class="fa fa-angle-double-left" href="<?php

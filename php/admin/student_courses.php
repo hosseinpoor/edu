@@ -77,7 +77,7 @@ include("sidebar_admin.php");
         }
         return $cost;
     }
-    echo "<h1 style='text-align: right;'>";
+    echo "<div class='mt-5'><a class='namelink' href='student.php?mail=".$_GET['mail']."'>";
     $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
@@ -86,23 +86,23 @@ include("sidebar_admin.php");
     } else {
         header("location:students.php");
     }
-    echo "</h1>";
+    echo "</a></div>";
     $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
     $result = mysqli_query($db, $sql);
-    echo "<span style='text-align: right;'>لیست دروس ثبت نامی</span>";
-    echo "<table style='margin-top: 15px' class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark' style='text-align:center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
+    echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
+    echo "<table class='table table-striped table-bordered table-hover mt-2'>";
+    echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row' data-href='edit_course.php?id=" . $row["courseId"] . "' style='text-align:center'>";
+            echo "<tr class='clickable-row text-center' data-href='edit_course.php?id=" . $row["courseId"] . "'>";
             echo "<td>" . $row["title"] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" ."<td>" . getPay($row['discountId'], $db, $row['cost']) . "</td>". "<td>" .
                 '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">لیست دانشجویان</a>'
                 . "</td>";
             echo "</tr>";
         }
     } else {
-        echo "<tr style='text-align:center'>";
+        echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }

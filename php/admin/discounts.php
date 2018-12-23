@@ -60,12 +60,12 @@ include("sidebar_admin.php");
 
     $sql = "SELECT * FROM discount ORDER BY discountId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
-    echo "<h1 style='text-align: right;'>پنل مدیریت</h1>";
-    echo "<span style='text-align: right;padding: 10px;'>لیست تخفیف ها</span>";
-    echo '<a style="float: left;" href="new_discount.php" class="btn btn-success" role="button">تخفیف جدید</a>';
-    echo '<a style="float: left; margin-left: 5px" href="download/discounts_download.php" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
-    echo "<table style='margin-top: 15px' class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark' style='text-align:center'> <tr> <th>درس</th> <th>نوع</th> <th>مقدار</th> </tr> </thead>";
+    echo "<h1 class='text-right'>پنل مدیریت</h1>";
+    echo "<span class='text-right'>لیست تخفیف ها</span>";
+    echo '<a href="new_discount.php" class="btn btn-success float-left" role="button">تخفیف جدید</a>';
+    echo '<a href="download/discounts_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
+    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>درس</th> <th>نوع</th> <th>مقدار</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
 
@@ -73,7 +73,7 @@ include("sidebar_admin.php");
             $s = "SELECT title FROM course WHERE courseId = " . $row["courseId"];
             $r = mysqli_query($db, $s);
             $crow = mysqli_fetch_assoc($r);
-            echo "<tr class='clickable-row' data-href='edit_discount.php?id=" . $row["discountId"] . "' style='text-align:center'>";
+            echo "<tr class='clickable-row text-center' data-href='edit_discount.php?id=" . $row["discountId"] . "'>";
             if ($row['isRial'])
                 echo "<td>" . $crow["title"] . "</td>" . "<td>" . $row["type"] . "</td>" . "<td>" . $row["amount"] . " ریال</td>";
             else
@@ -81,7 +81,7 @@ include("sidebar_admin.php");
             echo "</tr>";
         }
     } else {
-        echo "<tr style='text-align:center'>";
+        echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }

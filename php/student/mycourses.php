@@ -30,24 +30,24 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
 
         $sql = "SELECT courseId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND status = 1 AND active = 1";
         $result = mysqli_query($db, $sql);
-        echo "<span style='text-align: right;'>دروس من:</span>";
-        echo '<a style="float: left;" href="courses.php" class="btn btn-info" role="button">تمام دروس</a>';
-        echo "<table style='margin-top: 15px' class='table table-striped table-bordered table-hover'>";
-        echo "<thead class='thead-dark' style='text-align:center'> <tr> <th>عنوان</th> <th>روز های برگزاری</th> <th>هزینه</th> </tr> </thead>";
+        echo "<span class='text-right'>دروس من:</span>";
+        echo '<a href="courses.php" class="btn btn-info float-left" role="button">تمام دروس</a>';
+        echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+        echo "<thead class='thead-dark text-center'> <tr> <th>عنوان</th> <th>روز های برگزاری</th> <th>هزینه</th> </tr> </thead>";
         echo "<tbody>";
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 $s = "SELECT title, holdingDays, cost , courseId FROM course WHERE courseId = " . $row["courseId"];
                 $r = mysqli_query($db, $s);
                 while ($crow = mysqli_fetch_assoc($r)) {
-                    echo "<tr class='clickable-row' data-href='course.php?id=" . $crow["courseId"] . "' style='text-align:center'>";
+                    echo "<tr class='clickable-row text-center' data-href='course.php?id=" . $crow["courseId"] . "'>";
                     echo "<td>" . $crow["title"] . "</td>" . "<td>" . $crow["holdingDays"] . "</td>" . "<td>" . $crow["cost"] . "</td>";
                     echo "</tr>";
                 }
             }
 
         } else {
-            echo "<tr style='text-align:center'>";
+            echo "<tr class='text-center'>";
             echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
             echo "</tr>";
         }

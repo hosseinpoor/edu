@@ -44,7 +44,7 @@ if (empty($_SESSION['temail']))
 include("sidebar_admin.php");
 ?>
 
-<div class="content" style="padding: 50px">
+<div class="content p-5">
 
     <?php
     $sql = "SELECT * FROM students WHERE email = '" . $_GET['mail'] . "'";

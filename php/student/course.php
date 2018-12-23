@@ -96,7 +96,7 @@ session_start();
                 $res = mysqli_fetch_assoc($result);
                 if ($row['cost']) {
                     echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                    echo "<span style='padding-right: 2em' id='finalCost'>";
+                    echo "<span class='pr-2' id='finalCost'>";
 
                     if (isset($res['discountId']) && !empty($res['discountId'])) {
                         $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
@@ -146,7 +146,7 @@ session_start();
                                 $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
                         }
                         echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                        echo "<span style='padding-right: 2em' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
+                        echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
                         echo "<br>";
                         $discountCode = $reagent;
 
@@ -169,7 +169,7 @@ session_start();
                 $res = mysqli_fetch_assoc($result);
                 if ($row['cost']) {
                     echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                    echo "<span style='padding-right: 2em' id='finalCost'>";
+                    echo "<span class='pr-2' id='finalCost'>";
 
                     if (isset($res['discountId']) && !empty($res['discountId'])) {
                         $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
@@ -195,7 +195,7 @@ session_start();
 
                 if ($row['cost']) {
                     echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                    echo "<span style='padding-right: 2em' id='finalCost'></span>";
+                    echo "<span class='pr-2' id='finalCost'></span>";
                     echo "<br>";
                     echo '<label for="discount">کد تخفیف:</label>
                     <input type="text"  id="discount">
@@ -238,7 +238,7 @@ session_start();
                             $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
                     }
                     echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                    echo "<span style='padding-right: 2em' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
+                    echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
                     echo "<br>";
                     $discountCode = $reagent;
 
@@ -253,7 +253,7 @@ session_start();
         } else {
             if ($row['cost']) {
                 echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                echo "<span style='padding-right: 2em' id='finalCost'></span>";
+                echo "<span class='pr-2' id='finalCost'></span>";
                 echo "<br>";
                 echo '<label for="discount">کد تخفیف:</label>
                 <input type="text"  id="discount">

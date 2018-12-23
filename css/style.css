@@ -29,6 +29,17 @@ input{
     display: none;
 }
 
+.namelink{
+    font-size:3em;
+    line-height:1.5em;
+    text-decoration: none
+}
+.namelink:hover{
+    font-size:3em;
+    line-height:1.5em;
+    text-decoration: none
+}
+
 .invalid{
     text-decoration: line-through;
     text-decoration-color: red;

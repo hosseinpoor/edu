@@ -48,16 +48,16 @@ include("sidebar_admin.php");
 
     $sql = "SELECT * FROM (teachers LEFT JOIN course ON teachers.email = course.teacherMail) ORDER BY teachers.family LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
-    echo "<h1 style='text-align: right;'>پنل مدیریت</h1>";
-    echo "<span style='text-align: right;'>لیست تمام اساتید</span>";
-    echo '<a style="float: left;" href="new_teacher.php" class="btn btn-success" role="button">استاد جدید</a>';
-    echo '<a style="float: left;margin-left: 5px" href="download/teachers_download.php" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
-    echo "<table style='margin-top: 15px' class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark' style='text-align:center'> <tr> <th style='width: 28%'>نام و نام خانوادگی</th> <th style='width: 28%'>رایانامه</th> <th style='width: 28%'>شماره تماس</th> <th style='width: 16%'>دروس تدریسی</th> </tr> </thead>";
+    echo "<h1 class='text-right'>پنل مدیریت</h1>";
+    echo "<span class='text-right'>لیست تمام اساتید</span>";
+    echo '<a href="new_teacher.php" class="btn btn-success float-left" role="button">استاد جدید</a>';
+    echo '<a href="download/teachers_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
+    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>نام و نام خانوادگی</th> <th style='width: 28%'>رایانامه</th> <th style='width: 28%'>شماره تماس</th> <th style='width: 16%'>دروس تدریسی</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row' data-href='teacher.php?mail=" . $row["email"] . "' style='text-align:center'>";
+            echo "<tr class='clickable-row text-center' data-href='teacher.php?mail=" . $row["email"] . "'>";
             echo "<td>" . $row["name"] . " " . $row["family"] . "</td>" . "<td>" . $row["email"] . "</td>" . "<td>" . $row["phoneNum"] . "</td>" . "<td>" ;
             if($row['title'] != "") echo '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">' . $row['title'] . '</a>' ;
             echo "</td>";
@@ -65,7 +65,7 @@ include("sidebar_admin.php");
 
         }
     } else {
-        echo "<tr style='text-align:center'>";
+        echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }

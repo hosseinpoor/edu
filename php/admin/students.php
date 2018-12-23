@@ -87,37 +87,37 @@ include("sidebar_admin.php");
 
 
     $cost = 0;
-    echo "<h1 style='text-align: right;'>لیست دانشجویان</h1>";
-    echo '<a style="float: left;" href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo "<h1 class='text-right'>لیست دانشجویان</h1>";
+    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
     $sql = "SELECT title , cost FROM course WHERE courseId = " . $_GET['id'];
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
-        echo "<div style='text-align: right;padding: 10px;'>افراد ثبت نام کرده در " . $row['title'] . "</div>";
+        echo "<div class='text-right p-2'>افراد ثبت نام کرده در " . $row['title'] . "</div>";
         $cost = $row['cost'];
     } else {
-        echo "<div style='text-align: right;padding: 10px;'>افراد ثبت نام کرده در کلاس</div>";
+        echo "<div class='text-right p-2'>افراد ثبت نام کرده در کلاس</div>";
     }
 
 
     $sql = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
     echo "<table class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark' style='text-align:center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th>مبلغ پرداختی</th> </tr> </thead>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th>مبلغ پرداختی</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
             $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
             $r = mysqli_query($db, $s);
             while ($crow = mysqli_fetch_assoc($r)) {
-                echo "<tr class='clickable-row' data-href='student.php?mail=" . $row["studentMail"] . "' style='text-align:center'>";
+                echo "<tr class='clickable-row text-center' data-href='student.php?mail=" . $row["studentMail"] . "'>";
                 echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
                 echo "</tr>";
             }
         }
 
     } else {
-        echo "<tr style='text-align:center'>";
+        echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }

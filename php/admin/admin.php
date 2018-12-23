@@ -83,23 +83,23 @@ include("sidebar_admin.php");
 
     $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email  ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
-    echo "<h1 style='text-align: right;'>پنل مدیریت</h1>";
-    echo "<span style='text-align: right;'>لیست تمام دروس</span>";
-    echo '<a style="float: left;" href="new_course.php" class="btn btn-success" role="button">درس جدید</a>';
-    echo '<a style="float: left; margin-left: 5px" href="download/allcourses_download.php" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
-    echo "<table style='margin-top: 15px;overflow-x: auto' class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark' style='text-align:center'> <tr> <th style='width: 15%'>عنوان</th> <th style='width: 15%'>استاد</th> <th style='width: 15%'>روز های برگزاری</th> <th style='width: 15%'>هزینه</th> <th style='width: 15%'>تعداد ثبت نامی</th> <th style='width: 15%'>مبلغ کل ثبت نام</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
+    echo "<h1 class='text-right'>پنل مدیریت</h1>";
+    echo "<span class='text-right'>لیست تمام دروس</span>";
+    echo '<a href="new_course.php" class="btn btn-success float-left" role="button">درس جدید</a>';
+    echo '<a href="download/allcourses_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
+    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo "<thead class='thead-dark text-center'> <tr> <th style='width: 15%'>عنوان</th> <th style='width: 15%'>استاد</th> <th style='width: 15%'>روز های برگزاری</th> <th style='width: 15%'>هزینه</th> <th style='width: 15%'>تعداد ثبت نامی</th> <th style='width: 15%'>مبلغ کل ثبت نام</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row' data-href='edit_course.php?id=" . $row["courseId"] . "' style='text-align:center'>";
+            echo "<tr class='clickable-row text-center' data-href='edit_course.php?id=" . $row["courseId"] . "'>";
             echo "<td>" . $row["title"] . "</td>" . "<td>" . $row['name'] . " " . $row['family'] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" . "<td>" . getSubmitCount($row['courseId'], $db) . "</td>" . "<td>" . getTotalPay($row['courseId'], $db) . "</td>" . "<td>" .
                 '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">لیست دانشجویان</a>'
                 . "</td>";
             echo "</tr>";
         }
     } else {
-        echo "<tr style='text-align:center'>";
+        echo "<tr class='text-center'>";
         echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }
