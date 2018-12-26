@@ -73,7 +73,7 @@ $(document).ready(function () {
             $(".reagentType").show();
             $("#discountType").val("معرف");
             $("#discountCode").val($("#reagent").val());
-            $("#link").text("http://localhost/edu/php/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
+            $("#link").text("http://localhost/edu/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
         }
         else if($('#reagentCheck').is(":not(:checked)")){
             $(".noReagentType").show();
@@ -86,7 +86,7 @@ $(document).ready(function () {
             $(".reagentType").show();
             $("#discountType").val("معرف");
             $("#discountCode").val($("#reagent").val());
-            $("#link").text("http://localhost/edu/php/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
+            $("#link").text("http://localhost/edu/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
         }
         else {
             $(".noReagentType").show();
@@ -98,10 +98,10 @@ $(document).ready(function () {
 
     $('#reagent').change(function () {
         $("#discountCode").val($("#reagent").val());
-        $("#link").text("http://localhost/edu/php/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
+        $("#link").text("http://localhost/edu/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
     });
     $('#course').change(function () {
-        $("#link").text("http://localhost/edu/php/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
+        $("#link").text("http://localhost/edu/student/course.php"+"?id="+$("#course").val()+"&reagent="+btoa($("#reagent").val()));
     });
 
 });
