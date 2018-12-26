@@ -88,7 +88,9 @@ include("sidebar_teacher.php");
 
     $cost = 0;
     echo "<h1 class='text-right'>لیست دانشجویان</h1>";
-    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo '</div>';
 
     $sql = "SELECT * FROM conf";
     $result = mysqli_query($db, $sql);

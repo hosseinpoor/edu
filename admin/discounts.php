@@ -62,9 +62,11 @@ include("sidebar_admin.php");
     $result = mysqli_query($db, $sql);
     echo "<h1 class='text-right'>پنل مدیریت</h1>";
     echo "<span class='text-right'>لیست تخفیف ها</span>";
-    echo '<a href="new_discount.php" class="btn btn-success float-left" role="button">تخفیف جدید</a>';
-    echo '<a href="download/discounts_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/discounts_download.php" class="btn btn-info ml-1" role="button">دانلود فایل اکسل</a>';
+    echo '<a href="new_discount.php" class="btn btn-success " role="button">تخفیف جدید</a>';
+    echo '</div>';
+    echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th>درس</th> <th>نوع</th> <th>مقدار</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {

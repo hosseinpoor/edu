@@ -12,6 +12,13 @@ function getSubmitCount($id, $db)
     return mysqli_num_rows($result);
 }
 
+function getReservedCount($id, $db)
+{
+    $sql = "SELECT * FROM orders WHERE courseId = " . $id . " AND active = 1 AND status = 3";
+    $result = mysqli_query($db, $sql);
+    return mysqli_num_rows($result);
+}
+
 function getTotalPay($id, $db)
 {
     $total = 0;
@@ -43,17 +50,17 @@ $msg = "";
 $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email AND email = '".$_SESSION['temail']."' ORDER BY courseId DESC";
 $result = mysqli_query($db, $sql);
 $msg .= "<table border='1'>";
-$msg .= "<thead> <tr> <th>عنوان</th> <th>استاد</th> <th>روز های برگزاری</th> <th>هزینه</th> <th>تعداد ثبت نامی</th> <th>مبلغ کل ثبت نام</th> </tr> </thead>";
+$msg .= "<thead> <tr> <th>عنوان</th> <th>استاد</th> <th>روز های برگزاری</th> <th>هزینه</th> <th>تعداد ثبت نامی</th> <th>تعداد رزرو</th> <th>مبلغ کل ثبت نام</th> </tr> </thead>";
 $msg .= "<tbody>";
 if (mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
         $msg .= "<tr>";
-        $msg .= "<td>" . $row["title"] . "</td>" . "<td>" . $row['name'] . " " . $row['family'] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" . "<td>" . getSubmitCount($row['courseId'], $db) . "</td>" . "<td>" . getTotalPay($row['courseId'], $db) . "</td>";
+        $msg .= "<td>" . $row["title"] . "</td>" . "<td>" . $row['name'] . " " . $row['family'] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" . "<td>" . getSubmitCount($row['courseId'], $db) . "</td>" . "<td>" . getReservedCount($row['courseId'], $db) . "</td>" . "<td>" . getTotalPay($row['courseId'], $db) . "</td>";
         $msg .= "</tr>";
     }
 } else {
     $msg .= "<tr style='text-align:center'>";
-    $msg .= "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
+    $msg .= "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>". "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
     $msg .= "</tr>";
 }
 $msg .= "</tbody>";

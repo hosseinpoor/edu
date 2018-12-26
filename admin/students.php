@@ -88,7 +88,9 @@ include("sidebar_admin.php");
 
     $cost = 0;
     echo "<h1 class='text-right'>لیست دانشجویان</h1>";
-    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo '</div>';
     $sql = "SELECT title , cost FROM course WHERE courseId = " . $_GET['id'];
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {

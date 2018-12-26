@@ -110,8 +110,10 @@ include("sidebar_admin.php");
     $sql = "SELECT title, holdingDays, cost, courseId , name , family FROM course INNER JOIN teachers WHERE teacherMail = email AND teacherMail = '".$_GET['mail']."' ORDER BY courseId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
     echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
-    echo '<a href="download/teachercourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/teachercourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo '</div>';
+    echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 15%'>عنوان</th> <th style='width: 15%'>استاد</th> <th style='width: 15%'>روز های برگزاری</th> <th style='width: 15%'>هزینه</th> <th style='width: 15%'>تعداد ثبت نامی</th> <th style='width: 15%'>مبلغ کل ثبت نام</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {

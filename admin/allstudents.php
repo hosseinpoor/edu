@@ -50,8 +50,10 @@ include("sidebar_admin.php");
     $result = mysqli_query($db, $sql);
     echo "<h1 class='text-right'>پنل مدیریت</h1>";
     echo "<span class='text-right'>لیست تمام دانشجویان</span>";
-    echo '<a href="download/allstudents_download.php" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/allstudents_download.php" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo '</div>';
+    echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>نام و نام خانوادگی</th> <th style='width: 28%'>رایانامه</th> <th style='width: 28%'>شماره تماس</th> <th style='width: 16%'>دروس ثبت نامی</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {

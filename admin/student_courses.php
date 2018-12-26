@@ -97,8 +97,10 @@ include("sidebar_admin.php");
     $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND status = 1 AND active = 1 AND course.courseId = orders.courseId  ORDER BY course.courseId DESC LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
     echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
-    echo '<a href="download/studentcourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a  href="download/studentcourses_download.php?mail='.$_GET["mail"].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
+    echo '</div>';
+    echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {

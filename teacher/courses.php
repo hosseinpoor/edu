@@ -92,9 +92,11 @@ include("sidebar_teacher.php");
     $result = mysqli_query($db, $sql);
     echo "<h1 class='text-right'>پنل اساتید</h1>";
     echo "<span class='text-right'>لیست دروس شما</span>";
-    echo '<a href="new_course.php" class="btn btn-success float-left" role="button">درس جدید</a>';
-    echo '<a href="download/allcourses_download.php" class="btn btn-info float-left ml-1" role="button">دانلود فایل اکسل</a>';
-    echo "<table class='table table-striped table-bordered table-hover mt-3'>";
+    echo '<div class="d-inline-block float-left pb-1">';
+    echo '<a href="download/allcourses_download.php" class="btn btn-info ml-1" role="button">دانلود فایل اکسل</a>';
+    echo '<a href="new_course.php" class="btn btn-success " role="button">درس جدید</a>';
+    echo '</div>';
+    echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th style='width: 15%'>عنوان</th> <th style='width: 15%'>استاد</th> <th style='width: 15%'>روز های برگزاری</th> <th style='width: 15%'>هزینه</th> <th style='width: 15%'>تعداد ثبت نامی</th> <th style='width: 15%'>تعداد رزرو</th> <th style='width: 15%'>مبلغ کل ثبت نام</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
