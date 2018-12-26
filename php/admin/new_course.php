@@ -48,7 +48,7 @@ if (!mysqli_connect_error()) {
 include("sidebar_admin.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
 
     <h2>افزودن درس جدید</h2>

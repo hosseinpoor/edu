@@ -17,7 +17,7 @@ if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
             $db = @mysqli_connect("localhost", "root", "", "ebbroker");
             if (!mysqli_connect_error()) {
                 mysqli_query($db, "SET NAMES utf8");
-                $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+                $sql = "SELECT family FROM students WHERE email = '" . base64_decode($_GET['mail']) . "'";
                 $result = mysqli_query($db, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     $row = mysqli_fetch_assoc($result);
@@ -54,7 +54,7 @@ if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
     function getPay($id, $db, $cost)
@@ -78,7 +78,7 @@ include("sidebar_teacher.php");
         return $cost;
     }
     echo "<div class='mt-5'><a class='namelink' href='student.php?mail=".$_GET['mail']."'>";
-    $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+    $sql = "SELECT family FROM students WHERE email = '" . base64_decode($_GET['mail']) . "'";
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
@@ -87,7 +87,7 @@ include("sidebar_teacher.php");
         header("location:students.php");
     }
     echo "</a></div>";
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
+    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . base64_decode($_GET['mail']) . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
     $result = mysqli_query($db, $sql);
     echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
     echo '<a href="download/studentcourses_download.php?mail='.$_GET['mail'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';

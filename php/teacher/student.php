@@ -16,7 +16,7 @@ if (empty($_SESSION['temail']))
             $db = @mysqli_connect("localhost", "root", "", "ebbroker");
             if (!mysqli_connect_error()) {
                 mysqli_query($db, "SET NAMES utf8");
-                $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+                $sql = "SELECT family FROM students WHERE email = '" . base64_decode($_GET['mail']) . "'";
                 $result = mysqli_query($db, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     $row = mysqli_fetch_assoc($result);
@@ -44,20 +44,29 @@ if (empty($_SESSION['temail']))
 include("sidebar_teacher.php");
 ?>
 
-<div class="content p-5">
+<div class="content p-5 <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
-    $sql = "SELECT * FROM students WHERE email = '" . $_GET['mail'] . "'";
+    $sql = "SELECT * FROM conf";
+    $res = mysqli_query($db,$sql);
+    $r = mysqli_fetch_assoc($res);
+
+    $sql = "SELECT * FROM students WHERE email = '" . base64_decode($_GET['mail']) . "'";
     $result = mysqli_query($db, $sql);
     $row = mysqli_fetch_assoc($result);
+
+    $phone = ($r['phoneAuth']) ? $row['phoneNum'] : "شما مجاز به مشاهده این بخش نیستید";
+    $mail = ($r['emailAuth']) ? $row['email'] : "شما مجاز به مشاهده این بخش نیستید";
+    $landline = ($r['landlineAuth']) ? $row['landlineNum'] : "شما مجاز به مشاهده این بخش نیستید";
+
     echo "نام : " . $row['name'] . "<br>";
     echo "نام خانوادگی : " . $row['family'] . "<br>";
     echo "نام پدر : " . $row['dadsName'] . "<br>";
     echo "کد ملی : " . $row['nationalId'] . "<br>";
-    echo "تلفن همراه : " . $row['phoneNum'] . "<br>";
-    echo "تلفن ثابت : " . $row['landlineNum'] . "<br>";
+    echo "تلفن همراه : " . $phone . "<br>";
+    echo "تلفن ثابت : " . $landline . "<br>";
     echo "میزان تحصیلات : " . $row['education'] . "<br>";
-    echo "رایانامه : " . $row['email'] . "<br>";
+    echo "رایانامه : " . $mail . "<br>";
     ?>
 
 </div>

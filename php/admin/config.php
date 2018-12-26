@@ -36,6 +36,110 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 include("sidebar_admin.php");
 ?>
 
+<?php
+$sql = "SELECT * FROM conf";
+$result = mysqli_query($db , $sql);
+$row = mysqli_fetch_assoc($result);
+?>
+
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
+    <h1 class='text-right'>پنل مدیریت</h1>
+    <br>
+    <h3 class='text-right'>دسترسی اساتید</h3>
+    <form id="idForm" action="" method="post" autocomplete="off">
+        <div class="form-group">
+            <label for="phoneAuth">مشاهده شماره تلفن همراه دانشجویان:</label>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="phoneAuth" <?php if($row['phoneAuth']) echo "checked" ?>> مجاز
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="phoneAuth"  <?php if(!$row['phoneAuth']) echo "checked" ?>> غیرمجاز
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="landlineAuth">مشاهده شماره تلفن ثابت دانشجویان:</label>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="landlineAuth"  <?php if($row['landlineAuth']) echo "checked" ?> > مجاز
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="landlineAuth" <?php if(!$row['landlineAuth']) echo "checked" ?>> غیرمجاز
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="emailAuth">مشاهده رایانامه دانشجویان:</label>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="emailAuth" <?php if($row['emailAuth']) echo "checked" ?>> مجاز
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="emailAuth" <?php if(!$row['emailAuth']) echo "checked" ?>> غیرمجاز
+                </label>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success" name="submit" value="signup" formnovalidate>اعمال تغییرات</button>
+    </form>
+</div>
+
 
 </body>
 </html>
+
+<?php
+function test_input($data)
+{
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+if (isset($_POST["submit"])) {
+
+        $db = @mysqli_connect("localhost", "root", "", "ebbroker");
+
+        if (!mysqli_connect_error()) {
+
+            $phoneAuth = mysqli_real_escape_string($db ,test_input($_POST['phoneAuth']));
+            $landlineAuth = mysqli_real_escape_string($db ,test_input($_POST['landlineAuth']));
+            $emailAuth = mysqli_real_escape_string($db ,test_input($_POST['emailAuth']));
+
+            $sql = "UPDATE conf SET 
+                                phoneAuth = $phoneAuth ,
+                                landlineAuth = $landlineAuth ,
+                                emailAuth = $emailAuth";
+
+            $result = mysqli_query($db, $sql);
+
+            if ($result > 0)
+                echo "<script>
+                    alert('the configuration updated');
+                    window.location.href='config.php';
+                    </script>";
+            else
+                echo "<script>
+                    alert('error in updating the configuration');
+                    </script>";
+
+            mysqli_close($db);
+
+        } else {
+            echo "<script>
+                        alert('error in connecting to DB. please try again later');
+                        </script>";
+        }
+
+    }
+
+
+
+?>

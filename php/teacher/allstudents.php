@@ -35,7 +35,7 @@ if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
     function getOffset()
@@ -45,6 +45,10 @@ include("sidebar_teacher.php");
         } else
             return 0;
     }
+
+    $sql = "SELECT * FROM conf";
+    $result = mysqli_query($db, $sql);
+    $r = mysqli_fetch_assoc($result);
 
     $sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE course.teacherMail = '".$_SESSION['temail']."' AND active = 1 AND status = 1 ORDER BY students.family LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
@@ -56,8 +60,10 @@ include("sidebar_teacher.php");
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . $row["email"] . "'>";
-            echo "<td>" . $row["name"] . " " . $row["family"] . "</td>" . "<td>" . $row["email"] . "</td>" . "<td>" . $row["phoneNum"] . "</td>" . "<td>" .
+            $email = ($r['emailAuth']==1)? $row['email'] :  "شما مجاز به مشاهده این بخش نیستید";
+            $phone = ($r['phoneAuth']==1)? $row['phoneNum'] :  "شما مجاز به مشاهده این بخش نیستید";
+            echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . base64_encode($row["email"]) . "'>";
+            echo "<td>" . $row["name"] . " " . $row["family"] . "</td>" . "<td>" .$email . "</td>" . "<td>" . $phone . "</td>" . "<td>" .
                 '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">' . $row['title'] . '</a>'
                 . "</td>";
             echo "</tr>";

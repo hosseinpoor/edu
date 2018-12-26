@@ -44,7 +44,7 @@ if (empty($_SESSION['aemail']))
 include("sidebar_admin.php");
 ?>
 
-<div class="content p-5" >
+<div class="content p-5 <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>" >
 
     <?php
     $sql = "SELECT * FROM teachers WHERE email = '" . $_GET['mail'] . "'";
@@ -62,7 +62,7 @@ include("sidebar_admin.php");
     echo "شهر تولد : " . $row['birthCity'] . "<br>";
     echo "تاریخ تولد : " . str_replace('-' , '/' , $row['birthDay']) . "<br>";
     if(!empty($row['image'])){
-        echo "<img src='../../".$row['image']."' />";
+        echo "<img src='../../".$row['image']."' alt='تصویر' />";
     }
 
 

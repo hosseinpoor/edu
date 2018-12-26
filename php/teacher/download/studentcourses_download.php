@@ -6,7 +6,7 @@ $fileName = "دروس ";
 if (isset($_GET['mail']) && !empty($_GET['mail'])) {
 
     mysqli_query($db, "SET NAMES utf8");
-    $sql = "SELECT family FROM students WHERE email = '" . $_GET['mail'] . "'";
+    $sql = "SELECT family FROM students WHERE email = '" . base64_decode($_GET['mail']) . "'";
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
@@ -42,7 +42,7 @@ function getPay($id, $db, $cost)
     return $cost;
 }
 
-$sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . $_GET['mail'] . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId ORDER BY course.courseId DESC";
+$sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . base64_decode($_GET['mail']) . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId ORDER BY course.courseId DESC";
 $result = mysqli_query($db, $sql);
 $msg .= "<table border='1'>";
 $msg .= "<thead> <tr> <th>عنوان</th> <th >روز های برگزاری</th> <th>هزینه کلاس</th> <th>مبلغ پرداختی</th> </tr> </thead>";

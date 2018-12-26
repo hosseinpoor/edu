@@ -61,7 +61,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <h2>ویرایش اطلاعات تخفیف</h2>
     <form action="res_edit_discount.php?id=<?php echo $discountId ?>" method="post" autocomplete="off">

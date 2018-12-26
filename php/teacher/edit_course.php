@@ -64,7 +64,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <h2>ویرایش اطلاعات کلاس</h2>
     <form action="res_edit_course.php?id=<?php echo $courseId ?>" method="post" enctype="multipart/form-data"

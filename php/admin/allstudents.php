@@ -35,7 +35,7 @@ if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
 include("sidebar_admin.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
     function getOffset()

@@ -47,7 +47,7 @@ if (!mysqli_connect_error()) {
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
     function getOffset()

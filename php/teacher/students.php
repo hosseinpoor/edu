@@ -54,7 +54,7 @@ if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
 include("sidebar_teacher.php");
 ?>
 
-<div class="content">
+<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
     function getOffset()
@@ -89,6 +89,11 @@ include("sidebar_teacher.php");
     $cost = 0;
     echo "<h1 class='text-right'>لیست دانشجویان</h1>";
     echo '<a href="download/students_download.php?id='.$_GET['id'].'" class="btn btn-info float-left" role="button">دانلود فایل اکسل</a>';
+
+    $sql = "SELECT * FROM conf";
+    $result = mysqli_query($db, $sql);
+    $auth = mysqli_fetch_assoc($result);
+
     $sql = "SELECT title , cost FROM course WHERE courseId = " . $_GET['id'];
     $result = mysqli_query($db, $sql);
     if (mysqli_num_rows($result) > 0) {
@@ -110,8 +115,13 @@ include("sidebar_teacher.php");
             $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
             $r = mysqli_query($db, $s);
             while ($crow = mysqli_fetch_assoc($r)) {
-                echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . $row["studentMail"] . "'>";
-                echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
+                $sql = "SELECT * FROM conf";
+                $result = mysqli_query($db, $sql);
+                $auth = mysqli_fetch_assoc($result);
+                $email = ($auth['emailAuth']==1)? $crow['email'] :  "شما مجاز به مشاهده این بخش نیستید";
+                $phone = ($auth['phoneAuth']==1)? $crow['phoneNum'] :  "شما مجاز به مشاهده این بخش نیستید";
+                echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . base64_encode($row["studentMail"]) . "'>";
+                echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $email . "</td>" . "<td>" . $phone . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
                 echo "</tr>";
             }
         }
