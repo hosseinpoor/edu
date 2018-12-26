@@ -100,13 +100,13 @@ include("sidebar_admin.php");
     }
 
 
-    $sql = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
-    $result = mysqli_query($db, $sql);
+    $sq = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
+    $res = mysqli_query($db, $sq);
     echo "<table class='table table-striped table-bordered table-hover'>";
     echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th>مبلغ پرداختی</th> </tr> </thead>";
     echo "<tbody>";
-    if (mysqli_num_rows($result) > 0) {
-        while ($row = mysqli_fetch_assoc($result)) {
+    if (mysqli_num_rows($res) > 0) {
+        while ($row = mysqli_fetch_assoc($res)) {
             $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
             $r = mysqli_query($db, $s);
             while ($crow = mysqli_fetch_assoc($r)) {

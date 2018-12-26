@@ -25,6 +25,18 @@ function convertNumbers($srting, $toPersian = false)
     else return str_replace($fa_num, $en_num, $srting);
 }
 
+function capIncrease($db){
+    $s ="SELECT capacity FROM course WHERE courseId = " . $_GET['id'];
+    $r = mysqli_query($db , $s);
+    $a = mysqli_fetch_assoc($r);
+    $old = (int) $a['capacity'];
+    $new = (int) $_POST['cap'];
+    return $new - $old;
+    if($old < $new){
+        return $new - $old;
+    }
+}
+
 $title_unsafe = test_input($_POST['title']);
 $description_unsafe = test_input($_POST['des']);
 $startDate_unsafe = convertNumbers(test_input($_POST['startDate']));
@@ -119,6 +131,12 @@ if (isset($_POST["submit"])) {
             $titlePath = !empty($titlePath) ? "'$titlePath'" : "NULL";
             $brochureName = !empty($brochureName) ? "'$brochureName'" : "NULL";
             $titleName = !empty($titleName) ? "'$titleName'" : "NULL";
+
+            $dif = capIncrease($db , $capacity);
+            if($dif > 0) {
+                $s = "UPDATE orders SET status=1  WHERE courseId = " . $_GET['id'] . " AND active=1 AND status=3 ORDER BY orderId limit " . $dif;
+                mysqli_query($db, $s);
+            }
 
             $sql = "UPDATE course SET 
                                 title = '$title' ,

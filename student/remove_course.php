@@ -15,6 +15,8 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
 
             if ($result1 && $result2) {
                 echo "course removed";
+                $s = "UPDATE orders SET status=1  WHERE courseId = " . $_POST['id'] . " AND active=1 AND status=3 ORDER BY orderId DESC limit 1";
+                $r = mysqli_query($db, $s);
             } else {
                 echo "error in removing course" . mysqli_error($db);
             }

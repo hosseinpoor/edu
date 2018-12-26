@@ -25,6 +25,10 @@ function getPay($id, $db, $cost)
 
 mysqli_query($db, "SET NAMES utf8");
 
+$sql = "SELECT * FROM conf";
+$result = mysqli_query($db, $sql);
+$auth = mysqli_fetch_assoc($result);
+
 $fileName = "";
 $cost = 0;
 $sql = "SELECT title , cost FROM course WHERE courseId = " . $_GET['id'];
@@ -47,8 +51,10 @@ if (mysqli_num_rows($result) > 0) {
         $s = "SELECT name, family, email , phoneNum FROM students WHERE email = '" . $row["studentMail"] . "'";
         $r = mysqli_query($db, $s);
         while ($crow = mysqli_fetch_assoc($r)) {
+            $email = ($auth['emailAuth']==1)? $crow['email'] :  "شما مجاز به مشاهده این بخش نیستید";
+            $phone = ($auth['phoneAuth']==1)? $crow['phoneNum'] :  "شما مجاز به مشاهده این بخش نیستید";
             $msg .= "<tr>";
-            $msg .= "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
+            $msg .= "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $email . "</td>" . "<td>" . $phone . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
             $msg .= "</tr>";
         }
     }
