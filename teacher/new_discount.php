@@ -80,6 +80,20 @@ include("sidebar_teacher.php");
 
 
         <div class="form-group noReagentType">
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="needFile" id="codeId" checked="checked"> نیازمند کد
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="needFile" id="fileId"> نیازمند فایل
+                </label>
+            </div>
+        </div>
+
+
+        <div class="form-group noReagentType havecode">
             <span class="required">*</span>
             <label for="code">کد تخفیف:</label>
             <input type="text" class="form-control" id="discountCode" name="code" title="نوع" required

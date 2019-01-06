@@ -25,6 +25,9 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
             $brochureFile = $row['brochureFile'];
             $courseId = $row['courseId'];
             $teacherMail = $row['teacherMail'];
+            $type = $row['isVirtual'];
+            $quorum = $row['quorum'];
+            $qrCode = $row['qrCode'];
         } else {
             header("location:admin.php");
         }
@@ -69,6 +72,22 @@ include("sidebar_admin.php");
     <h2>ویرایش اطلاعات کلاس</h2>
     <form action="res_edit_course.php?id=<?php echo $courseId ?>" method="post" enctype="multipart/form-data"
           autocomplete="off">
+
+        <div class="form-group">
+            <label for="type">نوع:</label>
+            <br>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="type" <?php if($type==0) echo 'checked' ?>> حضوری
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="type" <?php if($type==1) echo 'checked' ?>> مجازی
+                </label>
+            </div>
+        </div>
+
         <div class="form-group">
             <span class="required">*</span>
             <label for="title">عنوان:</label>
@@ -115,6 +134,10 @@ include("sidebar_admin.php");
             <input type="text" class="form-control" name="cap" title="ظرفیت" value="<?php echo $capacity ?>">
         </div>
         <div class="form-group">
+            <label for="quorum">حد نصاب : </label>
+            <input type="text" class="form-control" name="quorum" title="حد نصاب" value="<?php echo $quorum ?>">
+        </div>
+        <div class="form-group">
             <label for="topicText">متن سرفصل : </label>
             <textarea class="form-control" name="topicText" rows="3"><?php echo $topicText ?></textarea>
         </div>
@@ -127,6 +150,11 @@ include("sidebar_admin.php");
             <label for="brochureFile">فایل بروشور : </label>
             <input type="file" class="form-control-file border" name="brochureFile" id="brochureFile"
                    title="فایل بروشور" value="<?php echo $brochureFile ?>">
+        </div>
+        <div class="form-group">
+            <label for="qrCode">تصویر qrCode : </label>
+            <input type="file" class="form-control-file border" name="qrCode" id="qrCode"
+                   title="تصویر qrCode" value="<?php echo $qrCode ?>">
         </div>
         <div class="form-group">
             <label for="teacher">استاد:</label>

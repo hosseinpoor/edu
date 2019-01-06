@@ -96,8 +96,10 @@ if (isset($_POST['submit'])) {
 
                             if (!empty($_GET['id']) && !empty($_GET['reagent']))
                                 header("location:student/course.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent']);
+                            else if (!empty($_GET['id']))
+                                header("location:student/course.php?id=" . $_GET['id']);
                             else
-                                header("location:student/courses.php");
+                                header("location:student/panel.php");
                             break;
                         default:
                             echo "<script>

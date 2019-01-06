@@ -100,7 +100,7 @@ include("sidebar_teacher.php");
 
     <?php
     include("pager.php");
-    $sql = "SELECT * FROM discount";
+    $sql = "SELECT * FROM discount WHERE courseId IN (".implode(",",$courses).")";
     createPager($sql, $db);
     ?>
 

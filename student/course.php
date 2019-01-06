@@ -29,13 +29,13 @@ session_start();
         }
         ?></title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/stu-style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../js/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script src="../js/script.js"></script>
 </head>
-<body dir="rtl">
+<body dir="rtl" class="text-right">
 <div class="container">
 
     <?php
@@ -81,7 +81,7 @@ session_start();
     //    echo "<br>";
 
 
-    echo "تاریخ شروع : " . $row['startDate'] . "<br>";
+    echo "تاریخ شروع : " . $row['startDate'] . "<span class='txt-red'> در صورت عدم رسیدن به حد نصاب این تاریخ ممکن است به تعویق بیافتد. توجه داشته باشید که پس از قطعی شدن تاریخ شروع کلاس با شما تماس گرفته خواهد شد.</span>" .  "<br>";
     echo "تاریخ پایان : " . $row['endDate'] . "<br>";
     echo "روز های برگزاری : " . $row['holdingDays'] . "<br>";
 
@@ -197,9 +197,58 @@ session_start();
                     echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
                     echo "<span class='pr-2' id='finalCost'></span>";
                     echo "<br>";
+
+                    echo '
+                    <span>نوع تخفیف:</span>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="none" class="form-check-input" name="disType" checked="checked"> هیچ کدام
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="code" class="form-check-input" name="disType"> کد تخفیف
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="file" class="form-check-input" name="disType"> نیازمند فایل
+                    </label>
+                    </div>
+                    <br>';
+
+                    echo '<div class="needFile">';
+                    echo '<span>آپلود فایل  : </span>
+                    <input type="file" class="border" name="neededFile" id="neededFile"
+                    title="فایل بروشور">
+                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
+                    echo '</div>';
+
+                    echo '<div class="needCode">';
                     echo '<label for="discount">کد تخفیف:</label>
                     <input type="text"  id="discount">
-                    <button id="discountBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+                    echo '</div>';
+
+                    echo '
+                    <span>نوع پرداخت:</span>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="receipt" class="form-check-input" name="payType" checked="checked"> آپلود فیش واریزی
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="online" class="form-check-input" name="payType"> پرداخت آنلاین
+                    </label>
+                    </div>
+                    <br>';
+
+                    echo '<div>';
+                    echo '<span>آپلود فیش واریزی  : </span>
+                    <input type="file" class="border" name="receipt" id="receipt"
+                    title="فایل بروشور">
+                    </div>';
 
                 } else {
                     echo "هزینه : " . "رایگان" . "<br>";
@@ -255,9 +304,38 @@ session_start();
                 echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
                 echo "<span class='pr-2' id='finalCost'></span>";
                 echo "<br>";
+
+                echo '
+                    <span>نوع تخفیف:</span>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="none" class="form-check-input" name="disType" checked="checked"> هیچ کدام
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="code" class="form-check-input" name="disType"> کد تخفیف
+                    </label>
+                    </div>
+                    <div class="form-check-inline">
+                    <label class="form-check-label">
+                    <input type="radio" value="file" class="form-check-input" name="disType"> نیازمند فایل
+                    </label>
+                    </div>
+                    <br>';
+
+                echo '<div class="needFile">';
+                echo '<span>آپلود فایل  : </span>
+                    <input type="file" class="border" name="neededFile" id="neededFile"
+                    title="فایل بروشور">
+                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
+                echo '</div>';
+
+                echo '<div class="needCode">';
                 echo '<label for="discount">کد تخفیف:</label>
-                <input type="text"  id="discount">
-                <button id="discountBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+                    <input type="text"  id="discount">
+                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+                echo '</div>';
 
             } else {
                 echo "هزینه : " . "رایگان" . "<br>";
@@ -269,11 +347,11 @@ session_start();
     echo "ظرفیت : " . $row['capacity'] . "<br>";
     echo "سرفصل ها : " . $row['topicText'] . "<br>";
     if ($row["topicFile"] != Null)
-        echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="'.$row['topicFileName'].'">فایل سرفصل ها</a> ';
+        echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="' . $row['topicFileName'] . '">فایل سرفصل ها</a> ';
     else
         echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
     if ($row["brochureFile"] != Null)
-        echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="'.$row['brochureFileName'].'">فایل بروشور</a>' . "<br>";
+        echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="' . $row['brochureFileName'] . '">فایل بروشور</a>' . "<br>";
     else
         echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
     echo "<br>";
@@ -283,11 +361,16 @@ session_start();
         $result = mysqli_query($db, $sql);
         if (mysqli_num_rows($result) > 0) {
             echo '<button id="removeBtn" class="btn btn-danger" name="remove" value="remove" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">حذف کلاس</button>';
+            echo '<a href="card.php?id=' .$_GET['id']. '" class="btn btn-success mr-1" role="button">دریافت کارت ورود به جلسه</a>';
         } else {
             echo '<button id="submitBtn" class="btn btn-success" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">ثبت کلاس</button>';
         }
     } else {
-        echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=".$_GET['id']."&reagent=".$_GET['reagent']."'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=".$_GET['id']."&reagent=".$_GET['reagent']."'>ثبت نام کنید</a>." . "</span>";
+        if (isset($_GET['reagent']) && !empty($_GET['reagent']))
+            echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>ثبت نام کنید</a>." . "</span>";
+        else
+            echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "'>ثبت نام کنید</a>." . "</span>";
+
     }
 
     ?>

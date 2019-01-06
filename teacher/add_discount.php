@@ -28,6 +28,7 @@ if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
     $amount_unsafe = test_input($_POST['amount']);
     $isrial_unsafe = test_input($_POST['isrial']);
     $code_unsafe = test_input($_POST['code']);
+    $needFile_unsafe = test_input($_POST['needFile']);
 
 
     if (isset($_POST["submit"])) {
@@ -43,12 +44,13 @@ if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
                 $amount = mysqli_real_escape_string($db, $amount_unsafe);
                 $isrial = mysqli_real_escape_string($db, $isrial_unsafe);
                 $code = mysqli_real_escape_string($db, $code_unsafe);
+                $needFile = mysqli_real_escape_string($db, $needFile_unsafe);
 
                 $sql = "SET NAMES 'utf8'";
                 mysqli_query($db, $sql);
 
-                $query = "insert into discount (startDate,endDate,amount,isRial,type,courseId,code) values
-                            ('$startDate','$endDate',$amount,$isrial,'$type',$course,'$code')";
+                $query = "insert into discount (startDate,endDate,amount,isRial,type,courseId,code,needFile) values
+                            ('$startDate','$endDate',$amount,$isrial,'$type',$course,'$code',$needFile)";
 
                 $result = mysqli_query($db, $query);
 

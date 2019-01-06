@@ -3,11 +3,12 @@ session_start();
 if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
 
+$qr = "";
 $brochurePath = "";
 $titlePath = "";
 $brochureName = "";
 $titleName = "";
-$baseUrl = 'E:\xampp\htdocs\dbtest\\';
+$baseUrl = 'E:\xampp\htdocs\edu\\';
 
 function test_input($data)
 {
@@ -44,9 +45,12 @@ $endDate_unsafe = convertNumbers(test_input($_POST['endDate']));
 $holdingDays_unsafe = test_input($_POST['holdingDays']);
 $cost_unsafe = test_input($_POST['cost']);
 $capacity_unsafe = test_input($_POST['cap']);
+$quorum_unsafe = test_input($_POST['quorum']);
 $topictext_unsafe = test_input($_POST['topicText']);
 $teacher_unsafe = test_input($_POST['teacher']);
 $courseId = test_input($_GET['id']);
+$type_unsafe = test_input($_POST['type']);
+
 
 if (isset($_POST["submit"])) {
 
@@ -58,6 +62,31 @@ if (isset($_POST["submit"])) {
 
             $sql = "SET NAMES 'utf8'";
             mysqli_query($db, $sql);
+
+
+            if (file_exists($_FILES['qrCode']['tmp_name']) || is_uploaded_file($_FILES['qrCode']['tmp_name'])) {
+
+                $qr = "";
+                $target_dir = "uploads/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
+                if (!file_exists($baseUrl . $target_dir)) {
+                    mkdir($baseUrl . $target_dir, 0777, true);
+                }
+                $info = new SplFileInfo(basename($_FILES["qrCode"]["name"]));
+                $target_dir = $target_dir . uniqid() . "." . $info->getExtension();
+                $target_qr = $baseUrl . $target_dir;
+
+                if (move_uploaded_file($_FILES["qrCode"]["tmp_name"], $target_qr)) {
+                    $qr = $target_dir;
+                } else {
+                    $qr = "";
+                }
+
+            } else {
+                $sql = "SELECT qrCode FROM course WHERE courseId = " . $courseId;
+                $result = mysqli_query($db, $sql);
+                $course = mysqli_fetch_assoc($result);
+                $qr = $course['qrCode'];
+            }
 
             if (file_exists($_FILES['brochureFile']['tmp_name']) || is_uploaded_file($_FILES['brochureFile']['tmp_name'])) {
 
@@ -118,21 +147,27 @@ if (isset($_POST["submit"])) {
             $holdingDays = mysqli_real_escape_string($db, $holdingDays_unsafe);
             $cost = mysqli_real_escape_string($db, $cost_unsafe);
             $capacity = mysqli_real_escape_string($db, $capacity_unsafe);
+            $quorum = mysqli_real_escape_string($db, $quorum_unsafe);
             $topictext = mysqli_real_escape_string($db, $topictext_unsafe);
             $teacher = mysqli_real_escape_string($db, $teacher_unsafe);
             $brochurePath = mysqli_real_escape_string($db, $brochurePath);
             $titlePath = mysqli_real_escape_string($db, $titlePath);
+            $type = mysqli_real_escape_string($db, $type_unsafe);
+            $qr = mysqli_real_escape_string($db, $qr);
+
 
             $startDate = !empty($startDate) ? "'$startDate'" : "NULL";
             $endDate = !empty($endDate) ? "'$endDate'" : "NULL";
             $holdingDays = !empty($holdingDays) ? "'$holdingDays'" : "NULL";
             $cost = !empty($cost) ? "'$cost'" : "NULL";
             $capacity = !empty($capacity) ? "'$capacity'" : "NULL";
+            $quorum = !empty($quorum) ? "'$quorum'" : "NULL";
             $topictext = !empty($topictext) ? "'$topictext'" : "NULL";
             $brochurePath = !empty($brochurePath) ? "'$brochurePath'" : "NULL";
             $titlePath = !empty($titlePath) ? "'$titlePath'" : "NULL";
             $brochureName = !empty($brochureName) ? "'$brochureName'" : "NULL";
             $titleName = !empty($titleName) ? "'$titleName'" : "NULL";
+            $qr = !empty($qr) ? "'$qr'" : "NULL";
 
             $dif = capIncrease($db , $capacity);
             if($dif > 0) {
@@ -148,12 +183,15 @@ if (isset($_POST["submit"])) {
                                 holdingDays = $holdingDays ,
                                 cost = $cost ,
                                 capacity = $capacity ,
+                                quorum = $quorum ,
                                 topicText = $topictext ,
                                 topicFile = $titlePath ,
                                 brochureFile = $brochurePath ,
                                 topicFileName = $titleName,
                                 brochureFileName = $brochureName,
-                                teacherMail = '$teacher'
+                                teacherMail = '$teacher' ,
+                                isVirtual = $type ,
+                                qrCode = $qr
                                 WHERE courseId = $courseId";
 
             $result = mysqli_query($db, $sql);

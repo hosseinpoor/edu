@@ -57,6 +57,15 @@ include("sidebar_teacher.php");
 <div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
 
     <?php
+
+    function getOffset()
+    {
+        if (isset($_GET['page']) && !empty($_GET['page']) && $_GET['page'] > 0) {
+            return ($_GET['page'] - 1) * 10;
+        } else
+            return 0;
+    }
+
     function getPay($id, $db, $cost)
     {
         if ($id != Null) {
@@ -87,32 +96,41 @@ include("sidebar_teacher.php");
         header("location:students.php");
     }
     echo "</a></div>";
-    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . base64_decode($_GET['mail']) . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
+    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId , receipt FROM orders INNER JOIN course WHERE studentMail = '" . base64_decode($_GET['mail']) . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId ORDER BY course.courseId LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
     echo "<span class='text-right'>لیست دروس ثبت نامی</span>";
     echo '<div class="d-inline-block float-left pb-1">';
     echo '<a href="download/studentcourses_download.php?mail='.$_GET['mail'].'" class="btn btn-info" role="button">دانلود فایل اکسل</a>';
     echo '</div>';
     echo "<table class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark text-center'> <tr> <th style='width: 28%'>عنوان</th> <th style='width: 28%'>روز های برگزاری</th> <th style='width: 28%'>هزینه کلاس</th> <th style='width: 28%'>مبلغ پرداختی</th> <th style='width: 16%'>لیست دانشجویان</th> </tr> </thead>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>عنوان</th> <th>روز های برگزاری</th> <th>هزینه کلاس</th> <th style='width: 10%'>مبلغ پرداختی</th> <th style='width: 10%'>فیش واریز</th> <th style='width: 10%'>لیست دانشجویان</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
             echo "<tr class='clickable-row text-center' data-href='edit_course.php?id=" . $row["courseId"] . "'>";
-            echo "<td>" . $row["title"] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" ."<td>" . getPay($row['discountId'], $db, $row['cost']) . "</td>". "<td>" .
+            echo "<td>" . $row["title"] . "</td>" . "<td>" . $row["holdingDays"] . "</td>" . "<td>" . $row["cost"] . "</td>" ."<td>" . getPay($row['discountId'], $db, $row['cost']) . "</td>";
+            if($row['receipt']) echo "<td>" . '<a class="disFile" target="_blank" href="' . "../".$row['receipt'] . '">' . "مشاهده" . '</a>' . "</td>";
+            else echo "<td></td>";
+            echo "<td>" .
                 '<a href="students.php?id=' . $row["courseId"] . '" class="btn btn-secondary" role="button">لیست دانشجویان</a>'
                 . "</td>";
             echo "</tr>";
         }
     } else {
         echo "<tr class='text-center'>";
-        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
+        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>". "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }
     echo "</tbody>";
     echo "</table>";
     ?>
 
+
+    <?php
+    include("pager.php");
+    $sql = "SELECT title, holdingDays, cost, course.courseId , discountId FROM orders INNER JOIN course WHERE studentMail = '" . base64_decode($_GET['mail']) . "' AND course.teacherMail = '".$_SESSION['temail']."' AND status = 1 AND active = 1 AND course.courseId = orders.courseId";
+    createPager($sql, $db);
+    ?>
 
 </div>
 

@@ -21,7 +21,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
             $courseId = $row['courseId'];
             $discountId = $row['discountId'];
             $code = $row['code'];
-
+            $needFile = $row['needFile'];
         } else {
             header("location:admin.php");
         }
@@ -97,8 +97,20 @@ include("sidebar_admin.php");
                    data-errormessage="این قسمت نمیتواند خالی باشد">
         </div>
 
-
         <div class="form-group noReagentType">
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="needFile" id="codeId" <?php if(!$needFile) echo 'checked' ?> > نیازمند کد
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="needFile" id="fileId" <?php if($needFile) echo 'checked' ?>> نیازمند فایل
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group noReagentType havecode">
             <span class="required">*</span>
             <label for="code">کد تخفیف:</label>
             <input type="text" class="form-control" id="discountCode" name="code" title="کد تخفیف" required

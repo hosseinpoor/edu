@@ -27,6 +27,7 @@ $amount_unsafe = test_input($_POST['amount']);
 $isrial_unsafe = test_input($_POST['isrial']);
 $courseId = test_input($_POST['course']);
 $discountId = test_input($_GET['id']);
+$needFile_unsafe = test_input($_POST['needFile']);
 
 if (isset($_POST["submit"])) {
 
@@ -47,6 +48,7 @@ if (isset($_POST["submit"])) {
             $isrial = mysqli_real_escape_string($db, $isrial_unsafe);
             $discountId = mysqli_real_escape_string($db, $discountId);
             $courseId = mysqli_real_escape_string($db, $courseId);
+            $needFile = mysqli_real_escape_string($db, $needFile_unsafe);
 
             $sql = "UPDATE discount SET 
                                 startDate = '$startDate' ,
@@ -55,7 +57,8 @@ if (isset($_POST["submit"])) {
                                 isRial = $isrial ,
                                 type = '$type' ,
                                 courseId = $courseId ,
-                                code = '$code'
+                                code = '$code',
+                                needFile = $needFile
                                 WHERE discountId = $discountId";
 
             $result = mysqli_query($db, $sql);

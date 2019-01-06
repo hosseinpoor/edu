@@ -53,6 +53,22 @@ include("sidebar_admin.php");
 
     <h2>افزودن درس جدید</h2>
     <form action="upload.php" method="post" enctype="multipart/form-data" autocomplete="off">
+
+        <div class="form-group">
+            <label for="type">نوع:</label>
+            <br>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="false" class="form-check-input" name="type" checked="checked"> حضوری
+                </label>
+            </div>
+            <div class="form-check-inline">
+                <label class="form-check-label">
+                    <input type="radio" value="true" class="form-check-input" name="type"> مجازی
+                </label>
+            </div>
+        </div>
+
         <div class="form-group">
             <span class="required">*</span>
             <label for="title">عنوان:</label>
@@ -95,6 +111,10 @@ include("sidebar_admin.php");
             <input type="text" class="form-control" name="cap" title="ظرفیت">
         </div>
         <div class="form-group">
+            <label for="quorum">حد نصاب : </label>
+            <input type="text" class="form-control" name="quorum" title="حد نصاب">
+        </div>
+        <div class="form-group">
             <label for="topicText">متن سرفصل : </label>
             <textarea class="form-control" name="topicText" rows="3"></textarea>
         </div>
@@ -106,6 +126,11 @@ include("sidebar_admin.php");
             <label for="brochureFile">فایل بروشور : </label>
             <input type="file" class="form-control-file border" name="brochureFile" id="brochureFile"
                    title="فایل بروشور">
+        </div>
+        <div class="form-group">
+            <label for="qrCode">تصویر qrCode : </label>
+            <input type="file" class="form-control-file border" name="qrCode" id="qrCode"
+                   title="تصویر qrCode">
         </div>
         <div class="form-group">
             <label for="teacher">استاد:</label>

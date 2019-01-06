@@ -1,5 +1,28 @@
 <?php
 
+$pic = "";
+$baseUrl = 'E:\xampp\htdocs\edu\\';
+
+function getGUID()
+{
+    if (function_exists('com_create_guid')) {
+        return com_create_guid();
+    } else {
+        mt_srand((double)microtime() * 10000);//optional for php 4.2.0 and up.
+        $charid = strtoupper(md5(uniqid(rand(), true)));
+        $hyphen = chr(45);// "-"
+        $uuid = //chr(123)// "{"
+            ""
+            . substr($charid, 0, 8) . $hyphen
+            . substr($charid, 8, 4) . $hyphen
+            . substr($charid, 12, 4) . $hyphen
+            . substr($charid, 16, 4) . $hyphen
+            . substr($charid, 20, 12)//.chr(125);// "}"
+        ;
+        return $uuid;
+    }
+}
+
 function test_input($data)
 {
     $data = trim($data);
@@ -27,6 +50,25 @@ if (isset($_POST['submit'])) {
 
         if (!mysqli_connect_error()) {
 
+            if (file_exists($_FILES['pictureFile']['tmp_name']) || is_uploaded_file($_FILES['pictureFile']['tmp_name'])) {
+
+                $pic = "";
+                $target_dir = "uploads/" . date("Y") . "/" . date("m") . "/" . date("d") . "/";
+                if (!file_exists($baseUrl . $target_dir)) {
+                    mkdir($baseUrl . $target_dir, 0777, true);
+                }
+                $info = new SplFileInfo(basename($_FILES["pictureFile"]["name"]));
+                $target_dir = $target_dir . getGUID() . "." . $info->getExtension();
+                $target_pic = $baseUrl . $target_dir;
+
+                if (move_uploaded_file($_FILES["pictureFile"]["tmp_name"], $target_pic)) {
+                    $pic = $target_dir;
+                } else {
+                    $pic = "";
+                }
+
+            }
+
             $email = mysqli_real_escape_string($db, $email_unsafe);
             $password = mysqli_real_escape_string($db, $password_unsafe);
             $name = mysqli_real_escape_string($db, $name_unsafe);
@@ -36,11 +78,15 @@ if (isset($_POST['submit'])) {
             $dadsName = mysqli_real_escape_string($db, $dadsName_unsafe);
             $education = mysqli_real_escape_string($db, $education_unsafe);
             $nationalId = mysqli_real_escape_string($db, $nationalId_unsafe);
+            $pic = mysqli_real_escape_string($db, $pic);
+
 
             $nationalId = !empty($nationalId) ? "'$nationalId'" : "NULL";
             $landlineNum = !empty($landlineNum) ? "'$landlineNum'" : "NULL";
             $dadsName = !empty($dadsName) ? "'$dadsName'" : "NULL";
             $education = !empty($education) ? "'$education'" : "NULL";
+            $pic = !empty($pic) ? "'$pic'" : "NULL";
+
 
             $sql = "SET NAMES 'utf8'";
             $res = mysqli_query($db, $sql);
@@ -49,8 +95,8 @@ if (isset($_POST['submit'])) {
             $result1 = mysqli_query($db, $query1);
 
             if ($result1 > 0) {
-                $query2 = "insert into students (name,family,nationalId,landlineNum,phoneNum,dadsName,education,email) values 
-                            ('$name','$family',$nationalId,$landlineNum,'$phoneNum',$dadsName,$education,'$email')";
+                $query2 = "insert into students (name,family,nationalId,landlineNum,phoneNum,dadsName,education,email,image) values 
+                            ('$name','$family',$nationalId,$landlineNum,'$phoneNum',$dadsName,$education,'$email',$pic)";
                 $result2 = mysqli_query($db, $query2);
                 if ($result2 > 0) {
                     session_start();
@@ -58,8 +104,10 @@ if (isset($_POST['submit'])) {
 
                     if (!empty($_GET['id']) && !empty($_GET['reagent']))
                         header("location:student/course.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent']);
+                    else if (!empty($_GET['id']))
+                        header("location:student/course.php?id=" . $_GET['id']);
                     else
-                        header("location:student/courses.php");
+                        header("location:student/panel.php");
                 } else
                     echo "<script>
                         alert('faild to sign up in students');
@@ -102,7 +150,7 @@ if (isset($_POST['submit'])) {
 
 <div class="container">
     <h2>ثبت نام</h2>
-    <form action="" method="post" autocomplete="off">
+    <form action="" enctype="multipart/form-data" method="post" autocomplete="off">
 
         <div class="form-group">
             <span class="required">*</span>
@@ -169,6 +217,11 @@ if (isset($_POST['submit'])) {
         <div class="form-group">
             <label for="education">تحصیلات:</label>
             <input type="text" class="form-control" id="education" title="تحصیلات" name="education">
+        </div>
+        <div class="form-group">
+            <label for="pictureFile">تصویر : </label>
+            <input type="file" class="form-control-file border" name="pictureFile" id="pictureFile"
+                   title="تصویر دانشجو">
         </div>
         <button type="submit" class="btn btn-success" name="submit" value="signup">ثبت نام</button>
     </form>

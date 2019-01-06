@@ -107,10 +107,10 @@ include("sidebar_teacher.php");
     }
 
 
-    $s = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
+    $s = "SELECT studentMail , discountId , receipt  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
     $res = mysqli_query($db, $s);
     echo "<table class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th>مبلغ پرداختی</th> </tr> </thead>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th style='width: 10%'>مبلغ پرداختی</th> <th style='width: 10%'>فیش واریز</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($res) > 0) {
         while ($row = mysqli_fetch_assoc($res)) {
@@ -121,13 +121,15 @@ include("sidebar_teacher.php");
                 $phone = ($auth['phoneAuth']==1)? $crow['phoneNum'] :  "شما مجاز به مشاهده این بخش نیستید";
                 echo "<tr class='clickable-row text-center' data-href='student_courselist.php?mail=" . base64_encode($row["studentMail"]) . "'>";
                 echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $email . "</td>" . "<td>" . $phone . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
+                if($row['receipt']) echo "<td>" . '<a class="disFile" target="_blank" href="' . "../".$row['receipt'] . '">' . "مشاهده" . '</a>' . "</td>";
+                else echo "<td></td>";
                 echo "</tr>";
             }
         }
 
     } else {
         echo "<tr class='text-center'>";
-        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
+        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }
     echo "</tbody>";
