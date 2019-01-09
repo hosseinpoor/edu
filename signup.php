@@ -1,5 +1,5 @@
 <?php
-
+include_once("strings.php");
 $pic = "";
 $baseUrl = 'E:\xampp\htdocs\edu\\';
 
@@ -110,7 +110,7 @@ if (isset($_POST['submit'])) {
                         header("location:student/panel.php");
                 } else
                     echo "<script>
-                        alert('faild to sign up in students');
+                        alert('".$signup_error."');
                         window.location.href='signup.php';
                         </script>";
             } else
@@ -119,7 +119,7 @@ if (isset($_POST['submit'])) {
             mysqli_close($db);
         } else {
             echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='signup.php';
                         </script>";
         }

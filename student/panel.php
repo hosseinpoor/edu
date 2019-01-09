@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 if (!isset($_SESSION['semail']) || empty($_SESSION['semail']))
     header("location:../login.php");
 
@@ -12,7 +13,7 @@ if (!mysqli_connect_error()) {
 
 } else {
     echo "<script>
-                alert('error in connecting to DB. please try again later');
+                alert('".$db_error."');
                 window.location.href='../login.php';
                 </script>";
 }
@@ -106,6 +107,13 @@ if (!mysqli_connect_error()) {
                 <div class="header">
                     <img src="../img/notif.png" alt="icon">
                     دوره های آموزشی شما
+                    <span class="mycourse-pager">
+                                    <?php
+                                    include("mycourses_pager.php");
+                                    $sql = "SELECT courseId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1 AND (status = 1 OR status = 3)";
+                                    createPager($sql, $db);
+                                    ?>
+                    </span>
                 </div>
 
                 <table class="table table-hover">
@@ -113,7 +121,15 @@ if (!mysqli_connect_error()) {
 
 
                     <?php
-                    $sql = "SELECT courseId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1";
+                    function getOffset()
+                    {
+                        if (isset($_GET['page']) && !empty($_GET['page']) && $_GET['page'] > 0) {
+                            return ($_GET['page'] - 1) * 9;
+                        } else
+                            return 0;
+                    }
+
+                    $sql = "SELECT courseId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1 AND (status = 1 OR status = 3) ORDER BY orderId DESC LIMIT 9 OFFSET " . getOffset();
                     $result = mysqli_query($db, $sql);
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {

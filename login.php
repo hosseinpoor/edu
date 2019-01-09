@@ -47,7 +47,7 @@
 
 
 <?php
-
+include_once("strings.php");
 function test_input($data)
 {
     $data = trim($data);
@@ -103,20 +103,20 @@ if (isset($_POST['submit'])) {
                             break;
                         default:
                             echo "<script>
-                            alert('faild to log in');
+                            alert('".$login_error."');
                             window.location.href='login.php';
                             </script>";
                     }
                 } else {
                     echo "<script>
-                        alert('faild to log in');
+                        alert('".$login_error."');
                         window.location.href='login.php';
                         </script>";
                 }
                 mysqli_close($db);
             } else {
                 echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='login.php';
                         </script>";
             }

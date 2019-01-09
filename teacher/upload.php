@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 if (empty($_SESSION['temail']))
     header("location:../login.php");
 
@@ -167,12 +168,12 @@ if (isset($_POST["submit"])) {
 
             if ($result > 0)
                 echo "<script>
-                    alert('new course added');
+                    alert('".$new_course_added."');
                     window.location.href='courses.php';
                     </script>";
             else
                 echo "<script>
-                    alert('error in adding new course');
+                    alert('".$new_course_add_error."');
                     window.location.href='courses.php';
                     </script>";
 
@@ -180,7 +181,7 @@ if (isset($_POST["submit"])) {
 
         } else {
             echo "<script>
-                    alert('error in connecting to DB. please try again later');
+                    alert('".$db_error."');
                     window.location.href=courses.php;
                     </script>";
         }

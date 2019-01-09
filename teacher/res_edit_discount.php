@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 if (!isset($_SESSION['temail']) || empty($_SESSION['temail']))
     header("location:../login.php");
 
@@ -65,12 +66,12 @@ if (isset($_POST["submit"])) {
 
             if ($result > 0)
                 echo "<script>
-                    alert('the discount updated');
+                    alert('".$discount_updated."');
                     window.location.href='discounts.php';
                     </script>";
             else
                 echo "<script>
-                    alert('error in updating the discount');
+                    alert('".$discount_update_error."');
                     window.location.href='edit_discount.php?id=" . $discountId . "';
                     </script>";
 
@@ -78,7 +79,7 @@ if (isset($_POST["submit"])) {
 
         } else {
             echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='edit_discount.php?id=" . $discountId . "';
                         </script>";
         }

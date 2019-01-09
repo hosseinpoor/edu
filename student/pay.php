@@ -1,5 +1,5 @@
 <?php
-
+include_once("../strings.php");
 function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
 {
     if ($jy > 979) {
@@ -54,17 +54,17 @@ if (isset($_POST['code']) && !empty($_POST['code']) && isset($_POST['id']) && !e
             if ($res['isRial'] == 1) {
                 if ($today >= $startG && $today <= $endG)
                     echo $_POST['cost'] - $res['amount'];
-                else echo "discount has not started yet or is ended";
+                else echo $discount_interval_error;
             } else {
                 if ($today >= $startG && $today <= $endG)
                     echo $_POST['cost'] - ($res['amount'] * $_POST['cost']) / 100;
-                else echo "discount has not started yet or is ended";
+                else echo $discount_interval_error;
             }
 
         } else
-            echo "error in finding discount";
+            echo $discount_not_find;
     } else {
-        echo "error in connecting to database";
+        echo $db_error;
     }
 } else {
     header("location:../login.php");

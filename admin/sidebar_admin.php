@@ -65,8 +65,9 @@
                 echo '<a href="' . $row["link"] . '" >' . '<i style="width:20px;text-align:center" class = "' . $row['style'] . '"></i> ' . $row["title"] . '</a>';
         }
     } else {
+        include_once("../strings.php");
         echo "<script>
-                alert('error in connecting to DB. please try again later');
+                alert('".$db_error."');
                 window.location.href='../login.php';
                 </script>";
     } ?>

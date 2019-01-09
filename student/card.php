@@ -15,7 +15,7 @@ $db = @mysqli_connect("localhost", "root", "", "ebbroker");
 if (!mysqli_connect_error()) {
     mysqli_query($db, "SET NAMES utf8");
 
-    $query = "select orderId from orders where studentMail = '" . $_SESSION['semail'] . "' and courseId = " . $_GET['id'] . " and active = 1 and status = 1";
+    $query = "select orderId from orders where studentMail = '" . $_SESSION['semail'] . "' and courseId = " . $_GET['id'] . " and active = 1 and status = 1 and verify = 1";
     $res = mysqli_query($db , $query);
     if(mysqli_num_rows($res) != 1)
         header("location:panel.php");

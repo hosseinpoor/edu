@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 if (!isset($_SESSION['semail']) || empty($_SESSION['semail']))
     header("location:../login.php");
 
@@ -12,7 +13,7 @@ if (!mysqli_connect_error()) {
 
 } else {
     echo "<script>
-                alert('error in connecting to DB. please try again later');
+                alert('".$db_error."');
                 window.location.href='../login.php';
                 </script>";
 }

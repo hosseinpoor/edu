@@ -112,24 +112,31 @@ if (isset($_SESSION['aemail']) && !empty($_SESSION['aemail'])) {
             $query1 = "insert into users (password,email,role) values ('$password','$email',3)";
             $result1 = mysqli_query($db, $query1);
 
+            include_once("../strings.php");
             if ($result1 > 0) {
                 $query2 = "insert into teachers (name,family,image,province,sex,address,landlineNum,phoneNum,birthDay,dadsName,birthCity,education,email) values
                             ('$name' , '$family' , $pic , '$province' , $sex , $address , $landlineNum , '$phoneNum' , $birthDay , $dadsName , $birthCity , '$education' , '$email')";
                 $result2 = mysqli_query($db, $query2);
                 if ($result2 > 0) {
                     echo "<script>
-                        alert('استاد جدید با موفقیت افزوده شد');
+                        alert('".$teacher_added."');
                         window.location.href='teachers.php';
                         </script>";
                 } else
-                    echo mysqli_error($db);
+                    echo "<script>
+                        alert('".$teacher_add_error."');
+                        window.location.href='teachers.php';
+                        </script>";
             } else
-                echo mysqli_error($db);
+                echo "<script>
+                        alert('".$teacher_add_error."');
+                        window.location.href='teachers.php';
+                        </script>";
 
             mysqli_close($db);
         } else {
             echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='new_teacher.php';
                         </script>";
         }

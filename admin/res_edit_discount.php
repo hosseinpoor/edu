@@ -63,14 +63,15 @@ if (isset($_POST["submit"])) {
 
             $result = mysqli_query($db, $sql);
 
+            include_once("../strings.php");
             if ($result > 0)
                 echo "<script>
-                    alert('the discount updated');
+                    alert('".$discount_updated."');
                     window.location.href='discounts.php';
                     </script>";
             else
                 echo "<script>
-                    alert('error in updating the discount');
+                    alert('".$discount_update_error."');
                     window.location.href='edit_discount.php?id=" . $discountId . "';
                     </script>";
 
@@ -78,7 +79,7 @@ if (isset($_POST["submit"])) {
 
         } else {
             echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='edit_discount.php?id=" . $discountId . "';
                         </script>";
         }

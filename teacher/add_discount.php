@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
 
     $pic = "";
@@ -56,12 +57,12 @@ if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
 
                 if ($result > 0)
                     echo "<script>
-                    alert('new discount added');
+                    alert('".$new_discount_added."');
                     window.location.href='discounts.php';
                     </script>";
                 else
                     echo "<script>
-                    alert('error in adding new discount');
+                    alert('".$new_discount_add_error."');
                     window.location.href='discounts.php';
                     </script>";
 
@@ -69,7 +70,7 @@ if (isset($_SESSION['temail']) && !empty($_SESSION['temail'])) {
 
             } else {
                 echo "<script>
-                    alert('error in connecting to DB. please try again later');
+                    alert('".$db_error."');
                     window.location.href='discounts.php';
                     </script>";
             }

@@ -196,14 +196,15 @@ if (isset($_POST["submit"])) {
 
             $result = mysqli_query($db, $sql);
 
+            include_once("../strings.php");
             if ($result > 0)
                 echo "<script>
-                    alert('the course updated');
+                    alert('".$course_updated."');
                     window.location.href='admin.php';
                     </script>";
             else
                 echo "<script>
-                    alert('error in updating the course');
+                    alert('".$course_update_error."');
                     window.location.href='edit_course.php?id=" . $courseId . "';
                     </script>";
 
@@ -211,7 +212,7 @@ if (isset($_POST["submit"])) {
 
         } else {
             echo "<script>
-                        alert('error in connecting to DB. please try again later');
+                        alert('".$db_error."');
                         window.location.href='edit_course.php?id=" . $courseId . "';
                         </script>";
         }

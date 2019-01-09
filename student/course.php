@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 $session = false;
 if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
     $session = true;
@@ -13,7 +14,7 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
 
     } else {
         echo "<script>
-                alert('error in connecting to DB. please try again later');
+                alert('".$db_error."');
                 window.location.href='courses.php';
                 </script>";
     }
@@ -455,21 +456,23 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
             }
 
             if ($row["topicFile"] != Null)
-                echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="' . $row['topicFileName'] . '">فایل سرفصل ها</a> ';
+                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="' . $row['topicFileName'] . '">فایل سرفصل ها</a> ';
             else
-                echo '<a href="../../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
+                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
             if ($row["brochureFile"] != Null)
-                echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="' . $row['brochureFileName'] . '">فایل بروشور</a>' . "<br>";
+                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="' . $row['brochureFileName'] . '">فایل بروشور</a>' . "<br>";
             else
-                echo '<a href="../../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
+                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
             echo "<br>";
 
             if (!empty($_SESSION['semail'])) {
-                $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
+                $sql = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
                 $result = mysqli_query($db, $sql);
                 if (mysqli_num_rows($result) > 0) {
                     echo '<button id="removeBtn" class="btn btn-danger" name="remove" value="remove" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">حذف کلاس</button>';
-                    echo '<a href="card.php?id=' . $_GET['id'] . '" class="btn btn-success mr-1" role="button">دریافت کارت ورود به جلسه</a>';
+                    $res = mysqli_fetch_assoc($result);
+                    if ($res['status'] == 1 && $res['verify'] == 1)
+                        echo '<a href="card.php?id=' . $_GET['id'] . '" class="btn btn-success mr-1" role="button">دریافت کارت ورود به جلسه</a>';
                 } else {
                     if (intval($remaining_cap) > 0)
                         echo '<button id="submitBtn" class="btn btn-success" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">ثبت کلاس</button>';

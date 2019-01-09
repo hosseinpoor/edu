@@ -116,6 +116,7 @@ body , div , a , td , li {
     width: 150px;
     height: 150px;
     border-radius: 50%;
+    background-size: cover;
 }
 
 .side-details{
@@ -172,6 +173,13 @@ body , div , a , td , li {
     height: 50px;
     padding: 5px;
     margin-right: 12px;
+}
+
+.courses .header span{
+    float: left;
+    line-height: 50px;
+    margin-left: 20px;
+    height: 50px;
 }
 
 .table tr td{
@@ -234,12 +242,8 @@ body , div , a , td , li {
 .intro-course img{
     height: 100%;
     width: 100%;
-    /*width: 45%;*/
-    /*float: right;*/
     border-radius: 0 20px 20px 0;
-    /*margin-left: 14px;*/
-
-
+    object-fit: cover;
 }
 
 .intro-submit{
@@ -436,6 +440,22 @@ color: #fff;
 }
 
 .pagination a:hover:not(.active) {background-color: #ddd;}
+
+.mycourse-pager{
+    text-align: center;
+}
+
+.mycourse-pager a {
+    text-align: center;
+    color: #fff;
+    float: left;
+    padding: 0px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    line-height: 50px;
+}
+
+.mycourse-pager a:hover:not(.active) {color: #10b41b;}
 
 .ribbon {
     position: absolute;

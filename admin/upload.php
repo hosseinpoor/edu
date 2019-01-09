@@ -165,15 +165,15 @@ if (isset($_POST["submit"])) {
                             ('$title','$description',$startDate,$endDate,$holdingDays,$cost,$capacity , $quorum ,$topictext,$titlePath,$titleName,$brochureName,$brochurePath,'$teacher',$qr,$type)";
 
             $result = mysqli_query($db, $query);
-
+            include_once("../strings.php");
             if ($result > 0)
                 echo "<script>
-                    alert('new course added');
+                    alert('".$new_course_added."');
                     window.location.href='admin.php';
                     </script>";
             else
                 echo "<script>
-                    alert('error in adding new course');
+                    alert('".$new_course_add_error."');
                     window.location.href='admin.php';
                     </script>";
 
@@ -181,7 +181,7 @@ if (isset($_POST["submit"])) {
 
         } else {
             echo "<script>
-                    alert('error in connecting to DB. please try again later');
+                    alert('".$db_error."');
                     window.location.href='admin.php';
                     </script>";
         }

@@ -1,6 +1,7 @@
 <?php
 // Start the session
 session_start();
+include_once("../strings.php");
 if (!isset($_SESSION['aemail']) || empty($_SESSION['aemail']))
     header("location:../login.php");
 
@@ -10,7 +11,7 @@ if (!mysqli_connect_error()) {
     mysqli_query($db, "SET NAMES utf8");
 } else {
     echo "<script>
-                alert('error in connecting to DB. please try again later');
+                alert('".$db_error."');
                 window.location.href='../login.php';
                 </script>";
 

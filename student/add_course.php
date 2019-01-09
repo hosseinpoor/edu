@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once("../strings.php");
 
 function getGUID()
 {
@@ -102,48 +103,67 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
             $a = mysqli_fetch_assoc($r);
             $cap = ($a['capacity'] == NULL) ? 999999 : $a['capacity'];
 
-            if ($disId != "NULL" && $needFile == 1) {
-                if (!empty($disFile) && $disFile != "NULL") {
-                    if (getSubmitCount($_POST['id'], $db) < $cap) {
+            if (intval($a['cost']) > 0) {
+                if ($disId != "NULL" && $needFile == 1) {
+                    if (!empty($disFile) && $disFile != "NULL") {
+                        if (getSubmitCount($_POST['id'], $db) < $cap) {
 
-                        $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,file,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 1  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $disFile . " , " . $resFile . " )";
-                        $result = mysqli_query($db, $sql);
-                        if ($result && $result1) {
-                            echo "course added";
-                        } else
-                            echo "error in adding course";
+                            $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,file,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 1  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $disFile . " , " . $resFile . " )";
+                            $result = mysqli_query($db, $sql);
+                            if ($result && $result1) {
+                                echo $course_added;
+                            } else
+                                echo $course_add_error;
+                        } else {
+                            $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,file,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 3  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $disFile . " , " . $resFile . " )";
+                            $result = mysqli_query($db, $sql);
+                            if ($result && $result1)
+                                echo $course_reserved;
+                            else
+                                echo $course_reserve_error;
+                        }
                     } else {
-                        $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,file,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 3  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $disFile . " , " . $resFile . " )";
-                        $result = mysqli_query($db, $sql);
-                        if ($result && $result1)
-                            echo "course reserved";
-                        else
-                            echo "error in reserving course";
+                        echo $disfile_needed;
                     }
                 } else {
-                    echo "you have to upload a file";
+                    if (getSubmitCount($_POST['id'], $db) < $cap) {
+
+                        $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 1  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " )";
+                        $result = mysqli_query($db, $sql);
+                        if ($result && $result1)
+                            echo $course_added;
+                        else
+                            echo $course_add_error;
+                    } else {
+                        $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 3  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " )";
+                        $result = mysqli_query($db, $sql);
+                        if ($result && $result1)
+                            echo $course_reserved;
+                        else
+                            echo $course_reserve_error;
+                    }
                 }
             } else {
                 if (getSubmitCount($_POST['id'], $db) < $cap) {
-
-                    $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 1  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " )";
+                    $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt,verify) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 1  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " , 1 )";
                     $result = mysqli_query($db, $sql);
                     if ($result && $result1)
-                        echo "course added";
+                        echo $course_added;
                     else
-                        echo "error in adding course";
+                        echo $course_add_error;
                 } else {
-                    $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 3  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " )";
+                    $sql = "INSERT INTO orders (courseId, StudentMail, status, active, date, discountId,receipt,verify) VALUES (" . $_POST['id'] . " , '" . $_POST['mail'] . "' , 3  , 1 , CAST(' " . date("Y-m-d") . "' AS DATE )  , " . $disId . " , " . $resFile . " , 1 )";
                     $result = mysqli_query($db, $sql);
                     if ($result && $result1)
-                        echo "course reserved";
+                        echo $course_reserved;
                     else
-                        echo "error in reserving course";
+                        echo $course_reserve_error;
                 }
+
             }
 
         } else {
-            echo "error in connecting to database";
+            echo $db_error;
         }
     } else {
         header("location:../login.php");
