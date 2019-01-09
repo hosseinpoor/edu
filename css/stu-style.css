@@ -392,7 +392,27 @@ color: #fff;
 }
 
 .txt-red{
-    color: #ff4343;
+    color: #ff4343 !important;
+}
+
+.txt-gray{
+    color: #777 !important;
+}
+
+.txt-green{
+    color: #10b41b !important;
+}
+
+.txt-yellow{
+    color: #d6d200 !important;
+}
+
+.txt-blue{
+    color: #0f1cff !important;
+}
+
+.txt-black{
+    color: #000 !important;
 }
 
 

@@ -61,7 +61,7 @@ if (isset($_GET['id']) && !empty($_GET['id']) && !isset($_POST['submit'])) {
 include("sidebar_admin.php");
 ?>
 
-<div class="content <?php echo ($_SESSION["isCollapse"]=='true')? 'ac' : '' ?>">
+<div class="content <?php echo ($_SESSION["isCollapse"] == 'true') ? 'ac' : '' ?>">
 
     <h2>ویرایش اطلاعات تخفیف</h2>
     <form action="res_edit_discount.php?id=<?php echo $discountId ?>" method="post" autocomplete="off">
@@ -100,22 +100,24 @@ include("sidebar_admin.php");
         <div class="form-group noReagentType">
             <div class="form-check-inline">
                 <label class="form-check-label">
-                    <input type="radio" value="false" class="form-check-input" name="needFile" id="codeId" <?php if(!$needFile) echo 'checked' ?> > نیازمند کد
+                    <input type="radio" value="false" class="form-check-input" name="needFile"
+                           id="codeId" <?php if (!$needFile) echo 'checked' ?> > نیازمند کد
                 </label>
             </div>
             <div class="form-check-inline">
                 <label class="form-check-label">
-                    <input type="radio" value="true" class="form-check-input" name="needFile" id="fileId" <?php if($needFile) echo 'checked' ?>> نیازمند فایل
+                    <input type="radio" value="true" class="form-check-input" name="needFile"
+                           id="fileId" <?php if ($needFile) echo 'checked' ?>> نیازمند فایل
                 </label>
             </div>
         </div>
 
-        <div class="form-group noReagentType havecode">
-            <span class="required">*</span>
-            <label for="code">کد تخفیف:</label>
-            <input type="text" class="form-control" id="discountCode" name="code" title="کد تخفیف" required
-                   value="<?php echo $code ?>"
-                   data-errormessage="این قسمت نمیتواند خالی باشد">
+        <div class="form-group havecode">
+                <span class="required">*</span>
+                <label for="code">کد تخفیف:</label>
+                <input type="text" class="form-control" id="discountCode" name="code" title="کد تخفیف" required
+                       value="<?php echo $code ?>"
+                       data-errormessage="این قسمت نمیتواند خالی باشد">
         </div>
 
         <div class="form-group reagentType">

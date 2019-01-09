@@ -32,7 +32,7 @@ function getSubmitCount($id, $db)
 function getTotalPay($id, $db)
 {
     $total = 0;
-    $sql = "SELECT cost , discountId FROM orders INNER JOIN course WHERE orders.courseId = " . $id . " AND course.courseId = orders.courseId AND active = 1 AND status = 1";
+    $sql = "SELECT cost , discountId FROM orders INNER JOIN course WHERE orders.courseId = " . $id . " AND course.courseId = orders.courseId AND active = 1 AND (status = 1 OR status = 3) AND verify = 1";
     $result = mysqli_query($db, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
         if ($row['discountId'] != Null) {

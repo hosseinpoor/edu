@@ -43,21 +43,21 @@ $(document).ready(function () {
         var file_dis = "";
         var file_res = "";
 
-        if($('#receipt').prop('files')){
+        if ($('#receipt').prop('files')) {
             if ($('#receipt').val() == "") {
                 alert("لطفا فیش واریز را آپلود کنید");
                 return;
             }
-            else{
+            else {
                 file_res = $('#receipt').prop('files')[0];
             }
         }
 
-        if($('#neededFile').prop('files')) {
+        if ($('#neededFile').prop('files')) {
             if ($('#needFile').val() == "") {
                 file_dis = "";
             }
-            else{
+            else {
                 file_dis = $('#neededFile').prop('files')[0];
             }
         }
@@ -129,14 +129,24 @@ $(document).ready(function () {
 
     });
 
+    $('#submitOrder').click(function (e) {
 
-    if ($('#codeId').is(':checked')) {
-        $('.havecode').show();
-    }
+        e.preventDefault();
 
-    if (!$('#codeId').is(':checked')) {
-        $('.havecode').hide();
-    }
+        $.post("../submitOrder.php",
+            {
+                id: $(this).attr("orderId"),
+            },
+            function (data) {
+                if (data == 'ok') {
+                    alert("سفارش با موفقیت تایید شد");
+                    $('#submitOrder').hide();
+                }
+                else
+                    alert("خطا در ثبت سفارش");
+            });
+
+    });
 
     $('input[type=radio][name=needFile]').change(function () {
         if (this.value == 'true') {
@@ -148,39 +158,6 @@ $(document).ready(function () {
             $("#discountCode").val("");
         }
     });
-
-    $('.needCode').hide();
-    $('.needFile').hide();
-
-    $('input[type=radio][name=disType]').change(function () {
-        if (this.value == 'none') {
-            $('.needCode').hide();
-            $('.needFile').hide();
-            $('#discount').val('');
-        }
-        if (this.value == 'file') {
-            $('.needCode').hide();
-            $('.needFile').show();
-            $('#discount').val('FILE');
-        }
-        else if (this.value == 'code') {
-            $('.needCode').show();
-            $('.needFile').hide();
-            $('#discount').val('');
-        }
-    });
-
-    if ($('#reagentCheck').is(":checked")) {
-        $(".noReagentType").hide();
-        $(".reagentType").show();
-        $("#discountType").val("معرف");
-        $("#discountCode").val($("#reagent").val());
-        $("#link").text("http://localhost/edu/student/course.php" + "?id=" + $("#course").val() + "&reagent=" + btoa($("#reagent").val()));
-    }
-    else {
-        $(".noReagentType").show();
-        $(".reagentType").hide();
-    }
 
     $('#reagentCheck').change(function () {
         if (this.checked) {
@@ -204,6 +181,43 @@ $(document).ready(function () {
     });
     $('#course').change(function () {
         $("#link").text("http://localhost/edu/student/course.php" + "?id=" + $("#course").val() + "&reagent=" + btoa($("#reagent").val()));
+    });
+
+    if ($('#reagentCheck').is(":checked")) {
+        $(".noReagentType").hide();
+        $('.havecode').hide();
+        $(".reagentType").show();
+        $("#discountType").val("معرف");
+        $("#discountCode").val($("#reagent").val());
+        $("#link").text("http://localhost/edu/student/course.php" + "?id=" + $("#course").val() + "&reagent=" + btoa($("#reagent").val()));
+    }
+    else {
+        if ($('#codeId').is(':checked')) {
+            $('.havecode').show();
+        }
+
+        if ($('#fileId').is(':checked')) {
+            $('.havecode').hide();
+        }
+    }
+
+    $('.needFile').hide();
+    $('.needCode').hide();
+
+    $('input[type=radio][name=disType]').change(function () {
+        if (this.value == 'none') {
+            $('.needFile').hide();
+            $('.needCode').hide();
+        }
+        else if (this.value == 'code') {
+            $('.needFile').hide();
+            $('.needCode').show();
+        }
+        else if (this.value == 'file') {
+            $('.needFile').show();
+            $('.needCode').hide();
+            $('#discount').val("FILE");
+        }
     });
 
 

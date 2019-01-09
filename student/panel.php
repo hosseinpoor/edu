@@ -6,7 +6,7 @@ if (!isset($_SESSION['semail']) || empty($_SESSION['semail']))
 $db = @mysqli_connect("localhost", "root", "", "ebbroker");
 if (!mysqli_connect_error()) {
     mysqli_query($db, "SET NAMES utf8");
-    $sql = "SELECT * FROM students WHERE email = '".$_SESSION['semail']."'";
+    $sql = "SELECT * FROM students WHERE email = '" . $_SESSION['semail'] . "'";
     $result = mysqli_query($db, $sql);
     $student = mysqli_fetch_assoc($result);
 
@@ -30,7 +30,7 @@ if (!mysqli_connect_error()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../js/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
-    <script src="../js/stu-script.js"></script>
+    <script src="../js/script.js"></script>
 </head>
 <body dir="rtl">
 
@@ -57,14 +57,14 @@ if (!mysqli_connect_error()) {
             <div class="sidebar box">
 
                 <?php
-                if($student['image'] == "NULL" || $student['image'] == "")
+                if ($student['image'] == "NULL" || $student['image'] == "")
                     echo '<img src="../img/avatar.png" class="avatar" alt="avatar">';
                 else
-                    echo '<img src="../'.$student['image'].'" class="avatar" alt="avatar">';
+                    echo '<img src="../' . $student['image'] . '" class="avatar" alt="avatar">';
                 ?>
 
                 <div class="side-details">
-                    <a  href="panel.php"><h2><?php echo $student['name']." ".$student['family'] ?></h2></a>
+                    <a href="panel.php"><h2><?php echo $student['name'] . " " . $student['family'] ?></h2></a>
                     <ul class="side-list">
                         <li>
                             <img src="../img/envelope.png" alt="icon" class="side-icon">
@@ -92,8 +92,8 @@ if (!mysqli_connect_error()) {
                             تنظیمات حساب کاربری
                         </li>
                         <li><a href="logout.php">
-                            <img src="../img/signout.png" alt="icon" class="side-icon">
-                            خروج
+                                <img src="../img/signout.png" alt="icon" class="side-icon">
+                                خروج
                             </a>
                         </li>
                     </ul>
@@ -113,7 +113,7 @@ if (!mysqli_connect_error()) {
 
 
                     <?php
-                    $sql = "SELECT courseId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND status = 1 AND active = 1";
+                    $sql = "SELECT courseId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1";
                     $result = mysqli_query($db, $sql);
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
@@ -122,7 +122,20 @@ if (!mysqli_connect_error()) {
                             while ($crow = mysqli_fetch_assoc($r)) {
                                 echo "<tr class='clickable-row text-center' data-href='course.php?id=" . $crow["courseId"] . "'>";
                                 echo '<td> <img src="../img/t1.png" alt="icon"> کلاس ' . $crow["title"] . "</td>" . '<td><img src="../img/t2.png" alt="icon"> استاد: ' . $crow["name"] . " " . $crow["family"] . "</td>" .
-                                        '<td><img src="../img/t3.png" alt="icon"> ' . $crow["holdingDays"] . "</td>" . '<td><img src="../img/t4.png" alt="icon"> محل برگزاری: کارگزاری اقتصاد بیدار'  . "</td>";
+                                    '<td><img src="../img/t3.png" alt="icon"> ' . $crow["holdingDays"] . "</td>";
+                                if ($row['verify']) {
+                                    if ($row['status'] == '1') {
+                                        echo '<td> <img src="../img/id-card.png" alt="icon"> ' . "<a class='disFile txt-black' target='_blank' href='card.php?id=" . $row['courseId'] . "'>کارت من</a>" . "</td>"
+                                            . '<td class="txt-green">تایید شده</td>';
+                                    }
+                                    if ($row['status'] == '3') {
+                                        echo '<td> <img src="../img/id-card.png" alt="icon"> ' . "<a class='disFile txt-gray' target='_blank'>کارت من</a>" . "</td>" .
+                                            '<td class="txt-blue">رزرو شده</td>';
+                                    }
+                                } else {
+                                    echo '<td> <img src="../img/id-card.png" alt="icon"> ' . "<a class='disFile txt-gray' target='_blank'>کارت من</a>" . "</td>" .
+                                        '<td class="txt-yellow">در انتظار تایید</td>';
+                                }
                                 echo "</tr>";
                             }
                         }
@@ -141,8 +154,8 @@ if (!mysqli_connect_error()) {
 
                 <div class="col-md-2 col-sm-4 col-xs-6  text-center option">
                     <a href="course_list.php">
-                    <img src="../img/course-list.png" alt="فهرست دوره ها">
-                    <div>فهرست دوره ها</div>
+                        <img src="../img/course-list.png" alt="فهرست دوره ها">
+                        <div>فهرست دوره ها</div>
                     </a>
                 </div>
 
@@ -179,11 +192,11 @@ if (!mysqli_connect_error()) {
                     return mysqli_num_rows($result);
                 }
 
-                $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '".$_SESSION['semail']."'  AND active = 1 AND status = 1) ORDER BY courseId DESC LIMIT 3";
+                $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "'  AND active = 1 AND (status = 1 OR status = 3)) ORDER BY courseId DESC LIMIT 3";
                 $result = mysqli_query($db, $sql);
 
                 while ($r = mysqli_fetch_assoc($result)) {
-                    $s = "SELECT * FROM course INNER JOIN teachers ON teacherMail = email WHERE courseId = ".$r['courseId'];
+                    $s = "SELECT * FROM course INNER JOIN teachers ON teacherMail = email WHERE courseId = " . $r['courseId'];
                     $res = mysqli_query($db, $s);
                     $row = mysqli_fetch_assoc($res);
 
@@ -191,16 +204,17 @@ if (!mysqli_connect_error()) {
                     if ($row['isVirtual']) echo '<div class="ribbon"><span>آنلاین</span></div>';
                     echo '<div class="row intro-course shadow-bottom mb-2">';
                     echo '<div class="col-sm-5 col-xs-12">';
-                    if ($row['image']==Null || $row['image']=='')
+                    if ($row['image'] == Null || $row['image'] == '')
                         echo '<img src="../img/teacher_av.png" alt="avatar"></div>';
                     else
-                        echo '<img src="../'.$row['image'].'" alt="avatar"></div>';
+                        echo '<img src="../' . $row['image'] . '" alt="avatar"></div>';
                     echo '<div class="col-sm-7 col-xs-12"> <div class="details">';
-                    echo '<div class="title">'.$row['title'].'</div>';
-                    echo '<div> <span>استاد: </span> <span>'.$row['name']." ".$row['family'].'</span> </div>';
-                    echo '<div> <span>تاریخ شروع: </span> <span>'.str_replace('-', '/', $row['startDate']).'</span> </div>';
-                    if ($row['cost']==NULL) echo '<div><span>هزینه دوره: </span><span class="txt-red"> رایگان</span></div>'; else echo '<div><span>هزینه دوره: </span>'.$row['cost'] .'ریال</div>';
+                    echo '<div class="title">' . $row['title'] . '</div>';
+                    echo '<div> <span>استاد: </span> <span>' . $row['name'] . " " . $row['family'] . '</span> </div>';
+                    echo '<div> <span>تاریخ شروع: </span> <span>' . str_replace('-', '/', $row['startDate']) . '</span> </div>';
+                    if ($row['cost'] == NULL) echo '<div><span>هزینه دوره: </span><span class="txt-red"> رایگان</span></div>'; else echo '<div><span>هزینه دوره: </span>' . $row['cost'] . 'ریال</div>';
                     ($row['capacity'] == NULL) ? $remaining_cap = "نامحدود" : $remaining_cap = intval($row['capacity']) - intval(getSubmitCount($row['courseId'], $db));
+                    if ($remaining_cap == "0") $remaining_cap = "<span class='txt-red'>تکمیل</span>";
                     echo '<div><span>ظرفیت باقی مانده: </span><span>' . $remaining_cap . '</span></div>';
                     echo '<div><span>محل برگزاری: </span><span>تهران</span></div>';
                     if ($remaining_cap)

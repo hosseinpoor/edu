@@ -46,7 +46,7 @@ include("sidebar_admin.php");
             return 0;
     }
 
-    $sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND status = 1 ORDER BY students.family LIMIT 10 OFFSET " . getOffset();
+    $sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND (status = 1 OR status = 3) ORDER BY students.family LIMIT 10 OFFSET " . getOffset();
     $result = mysqli_query($db, $sql);
     echo "<h1 class='text-right'>پنل مدیریت</h1>";
     echo "<span class='text-right'>لیست تمام دانشجویان</span>";
@@ -67,7 +67,7 @@ include("sidebar_admin.php");
                 $r = mysqli_query($db , $s);
                 $a = mysqli_fetch_assoc($r);
                 if($a['needFile']){
-                    echo 'فایل: '  . '<a class="disFile" target="_blank" href="' . "download/disFile.php?id=".$row['orderId'] . '">' . "مشاهده" . '</a>';
+                    echo 'فایل: '  . '<a class="disFile" target="_blank" href="' . "../".$row['file'] . '">' . "مشاهده" . '</a>';
                 }
                 else{
                     $sq = "SELECT name , family FROM teachers WHERE email = '".$a['code']."'";
@@ -75,6 +75,9 @@ include("sidebar_admin.php");
                     if(mysqli_num_rows($res) == 1){
                         $ans = mysqli_fetch_assoc($res);
                         echo 'معرف: ' . $ans['name'] . " " . $ans['family'];
+                    }
+                    else if($a['code'] == 'ALLUSERS'){
+                        echo "معرف: همه";
                     }
                     else{
                         echo 'کد: ' . $a['code'];
@@ -101,7 +104,7 @@ include("sidebar_admin.php");
 
     <?php
     include("pager.php");
-    $sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND status = 1";
+    $sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND (status = 1 OR status = 3)";
     createPager($sql, $db);
     ?>
 

@@ -102,10 +102,10 @@ include("sidebar_admin.php");
     }
 
 
-    $sq = "SELECT studentMail , discountId , receipt  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id']." ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
+    $sq = "SELECT studentMail , discountId , receipt , verify , orderId , file FROM orders WHERE (status = 1 OR status = 3) AND active = 1 AND courseId = " . $_GET['id'] . " ORDER BY orderId DESC LIMIT 10 OFFSET " . getOffset();
     $res = mysqli_query($db, $sq);
     echo "<table class='table table-striped table-bordered table-hover'>";
-    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th style='width: 10%'>مبلغ پرداختی</th> <th style='width: 10%'>فیش واریز</th> </tr> </thead>";
+    echo "<thead class='thead-dark text-center'> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تلفن همراه</th> <th style='width: 10%'>مبلغ پرداختی</th> <th style='width: 10%'>نوع تخفیف</th> <th style='width: 10%'>فیش واریز</th> </tr> </thead>";
     echo "<tbody>";
     if (mysqli_num_rows($res) > 0) {
         while ($row = mysqli_fetch_assoc($res)) {
@@ -113,16 +113,45 @@ include("sidebar_admin.php");
             $r = mysqli_query($db, $s);
             while ($crow = mysqli_fetch_assoc($r)) {
                 echo "<tr class='clickable-row text-center' data-href='student_courses.php?mail=" . $row["studentMail"] . "'>";
-                echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>";
-                if($row['receipt']) echo "<td>" . '<a class="disFile" target="_blank" href="' . "../".$row['receipt'] . '">' . "مشاهده" . '</a>' . "</td>";
-                else echo "<td></td>";
+                echo "<td>" . $crow["name"] . " " . $crow["family"] . "</td>" . "<td>" . $crow["email"] . "</td>" . "<td>" . $crow["phoneNum"] . "</td>" . "<td>" . getPay($row['discountId'], $db, $cost) . "</td>" . "<td>";
+                if ($row['discountId']) {
+                    $s = "SELECT * FROM discount WHERE discountId = " . $row['discountId'];
+                    $r = mysqli_query($db, $s);
+                    $a = mysqli_fetch_assoc($r);
+                    if ($a['needFile']) {
+                        echo 'فایل: ' . '<a class="disFile" target="_blank" href="' . "../" . $row['file'] . '">' . "مشاهده" . '</a>';
+                    } else {
+                        $sq = "SELECT name , family FROM teachers WHERE email = '" . $a['code'] . "'";
+                        $res = mysqli_query($db, $sq);
+                        if (mysqli_num_rows($res) == 1) {
+                            $ans = mysqli_fetch_assoc($res);
+                            echo 'معرف: ' . $ans['name'] . " " . $ans['family'];
+                        } else if ($a['code'] == 'ALLUSERS') {
+                            echo "معرف: همه";
+                        } else {
+                            echo 'کد: ' . $a['code'];
+                        }
+
+
+                    }
+                } else
+                    echo "بدون تخفیف";
+                echo "</td>";
+                if($row['receipt']) {
+                    echo "<td>" . '<a class="disFile" target="_blank" href="' . "../" . $row['receipt'] . '">' . "مشاهده" . '</a>';
+                    if (!$row['verify'])
+                        echo '<a class="disFile" id="submitOrder" orderId="' . $row['orderId'] . '" target="_blank" href="">' . " / تایید" . '</a>';
+                    echo "</td>";
+                }
+                else
+                    echo "<td></td>";
                 echo "</tr>";
             }
         }
 
     } else {
         echo "<tr class='text-center'>";
-        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>". "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
+        echo "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>" . "<td>" . "سطری جهت نمایش وجود ندارد" . "</td>";
         echo "</tr>";
     }
     echo "</tbody>";
@@ -132,8 +161,8 @@ include("sidebar_admin.php");
 
     <?php
     include("pager.php");
-    $sql = "SELECT studentMail , discountId  FROM orders WHERE status = 1 AND active = 1 AND courseId = " . $_GET['id'];
-    createPager($sql , $db);
+    $sql = "SELECT studentMail , discountId  FROM orders WHERE (status = 1 OR status = 3) AND active = 1 AND courseId = " . $_GET['id'];
+    createPager($sql, $db);
     ?>
 
 

@@ -8,7 +8,7 @@ $sql = "SELECT * FROM conf";
 $result = mysqli_query($db, $sql);
 $r = mysqli_fetch_assoc($result);
 
-$sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE course.teacherMail = '".$_SESSION['temail']."' AND active = 1 AND status = 1 ORDER BY students.family";
+$sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE course.teacherMail = '".$_SESSION['temail']."' AND active = 1 AND (status = 1 OR status = 3) ORDER BY students.family";
 $result = mysqli_query($db, $sql);
 echo "<table border='1'>";
 echo "<thead> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تماس</th> <th>دروس ثبت نامی</th> <th>نوع تخفیف</th> </tr> </thead>";
@@ -32,6 +32,9 @@ if (mysqli_num_rows($result) > 0) {
                 if(mysqli_num_rows($res) == 1){
                     $ans = mysqli_fetch_assoc($res);
                     echo 'معرف: ' . $ans['name'] . " " . $ans['family'];
+                }
+                else if($a['code'] == 'ALLUSERS'){
+                    echo "معرف: همه";
                 }
                 else{
                     echo 'کد: ' . $a['code'];

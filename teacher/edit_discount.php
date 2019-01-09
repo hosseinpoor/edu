@@ -112,7 +112,7 @@ include("sidebar_teacher.php");
             </div>
         </div>
 
-        <div class="form-group noReagentType havecode">
+        <div class="form-group havecode">
             <span class="required">*</span>
             <label for="code">کد تخفیف:</label>
             <input type="text" class="form-control" id="discountCode" name="code" title="کد تخفیف" required

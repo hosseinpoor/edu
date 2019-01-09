@@ -4,7 +4,7 @@ include("download.php");
 download("دانشجویان");
 $msg = "";
 
-$sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND status = 1 ORDER BY students.family";
+$sql = "SELECT * FROM (students LEFT JOIN orders ON students.email = orders.studentMail) INNER JOIN course ON course.courseId = orders.courseId WHERE active = 1 AND (status = 1 OR status = 3) ORDER BY students.family";
 $result = mysqli_query($db, $sql);
 echo "<table border='1'>";
 echo "<thead> <tr> <th>نام و نام خانوادگی</th> <th>رایانامه</th> <th>شماره تماس</th> <th>دروس ثبت نامی</th> <th>نوع تخفیف</th> </tr> </thead>";
