@@ -71,9 +71,10 @@ if (!mysqli_connect_error()) {
                             <img src="../img/envelope.png" alt="icon" class="side-icon">
                             پیام ها
                         </li>
-                        <li>
-                            <img src="../img/overtime.png" alt="icon" class="side-icon">
-                            برنامه کلاس ها
+                        <li><a href="course_list.php">
+                                <img src="../img/overtime.png" alt="icon" class="side-icon">
+                                برنامه کلاس ها
+                            </a>
                         </li>
                         <li><a href="finished_list.php">
                                 <img src="../img/finished.png" alt="icon" class="side-icon">

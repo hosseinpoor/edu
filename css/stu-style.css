@@ -125,11 +125,7 @@ body , div , a , td , li {
 }
 
 .side-details a{
-    color: #000;
-}
-.side-details a:hover{
-    color: #000;
-    font-size: 1.2em;
+    color: #000 !important;
     text-decoration: none;
 }
 
@@ -153,6 +149,10 @@ body , div , a , td , li {
     cursor: pointer;
     font-size: 1.2em;
     border-bottom:2px solid #000 ;
+}
+
+.side-list li a {
+    display: block;
 }
 
 .side-icon{
