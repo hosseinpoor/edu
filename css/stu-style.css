@@ -1,3 +1,6 @@
+body{
+    text-align: -webkit-center;
+}
 body , div , a , td , li {
  font-family: koodakb;
 }
@@ -97,6 +100,7 @@ body , div , a , td , li {
     padding: 10px;
     padding-top: 0px;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .box{
@@ -551,6 +555,9 @@ color: #fff;
     .topnav.responsive a.nav-oppening , .topnav.responsive a.nav-advice{
         display: none ;
     }
+    .course-table td:nth-child(3){
+        display: none;
+    }
 }
 
 @media screen and (max-width: 576px) {
@@ -582,6 +589,9 @@ color: #fff;
         float: none;
         display: block;
         text-align: right;
+    }
+    .course-table td:nth-child(4) , .course-table td:nth-child(5){
+        display: none;
     }
 }
 

@@ -117,7 +117,7 @@ if (!mysqli_connect_error()) {
                     </span>
                 </div>
 
-                <table class="table table-hover">
+                <table class="table table-hover course-table">
                     <tbody>
 
 
