@@ -10,6 +10,26 @@ $brochureName = "";
 $titleName = "";
 $baseUrl = 'E:\xampp\htdocs\edu\\';
 
+function getGUID()
+{
+    if (function_exists('com_create_guid')) {
+        return com_create_guid();
+    } else {
+        mt_srand((double)microtime() * 10000);//optional for php 4.2.0 and up.
+        $charid = strtoupper(md5(uniqid(rand(), true)));
+        $hyphen = chr(45);// "-"
+        $uuid = //chr(123)// "{"
+            ""
+            . substr($charid, 0, 8) . $hyphen
+            . substr($charid, 8, 4) . $hyphen
+            . substr($charid, 12, 4) . $hyphen
+            . substr($charid, 16, 4) . $hyphen
+            . substr($charid, 20, 12)//.chr(125);// "}"
+        ;
+        return $uuid;
+    }
+}
+
 function test_input($data)
 {
     $data = trim($data);
@@ -72,7 +92,7 @@ if (isset($_POST["submit"])) {
                     mkdir($baseUrl . $target_dir, 0777, true);
                 }
                 $info = new SplFileInfo(basename($_FILES["qrCode"]["name"]));
-                $target_dir = $target_dir . uniqid() . "." . $info->getExtension();
+                $target_dir = $target_dir . getGUID() . "." . $info->getExtension();
                 $target_qr = $baseUrl . $target_dir;
 
                 if (move_uploaded_file($_FILES["qrCode"]["tmp_name"], $target_qr)) {
@@ -96,7 +116,7 @@ if (isset($_POST["submit"])) {
                     mkdir($baseUrl . $target_dir, 0777, true);
                 }
                 $info = new SplFileInfo(basename($_FILES["brochureFile"]["name"]));
-                $target_dir = $target_dir . uniqid() . "." . $info->getExtension();
+                $target_dir = $target_dir . getGUID() . "." . $info->getExtension();
                 $target_brochure = $baseUrl . $target_dir;
 
                 if (move_uploaded_file($_FILES["brochureFile"]["tmp_name"], $target_brochure)) {
@@ -122,7 +142,7 @@ if (isset($_POST["submit"])) {
                     mkdir($baseUrl . $target_dir, 0777, true);
                 }
                 $info = new SplFileInfo(basename($_FILES["topicFile"]["name"]));
-                $target_dir = $target_dir . uniqid() . "." . $info->getExtension();
+                $target_dir = $target_dir . getGUID() . "." . $info->getExtension();
                 $target_title = $baseUrl . $target_dir;
 
                 if (move_uploaded_file($_FILES["topicFile"]["tmp_name"], $target_title)) {

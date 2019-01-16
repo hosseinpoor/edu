@@ -1,7 +1,7 @@
 <?php
-function createPager($sql, $db , $counter=0)
+function createPager($sql, $db , $counter=-1)
 {
-    if($counter == 0) {
+    if($counter == -1) {
         $result = mysqli_query($db, $sql);
         $count = mysqli_num_rows($result);
     }

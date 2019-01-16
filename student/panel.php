@@ -59,7 +59,7 @@ if (!mysqli_connect_error()) {
 
                 <?php
                 if ($student['image'] == "NULL" || $student['image'] == "")
-                    echo '<img src="../img/avatar.png" class="avatar" alt="avatar">';
+                    echo '<a href="panel.php"><img src="../img/avatar.png" class="avatar" alt="avatar"></a>';
                 else
                     echo '<img src="../' . $student['image'] . '" class="avatar" alt="avatar">';
                 ?>
@@ -71,27 +71,24 @@ if (!mysqli_connect_error()) {
                             <img src="../img/envelope.png" alt="icon" class="side-icon">
                             پیام ها
                         </li>
-                        <li><a href="course_list.php">
+                        <li>
                             <img src="../img/overtime.png" alt="icon" class="side-icon">
                             برنامه کلاس ها
-                            </a>
                         </li>
                         <li><a href="finished_list.php">
                                 <img src="../img/finished.png" alt="icon" class="side-icon">
-                                دوره های پایان یافته
+                                دوره های پایان یافته من
                             </a>
                         </li>
-                        <li>
-                            <img src="../img/payments.png" alt="icon" class="side-icon">
-                            پرداخت ها
+                        <li><a href="course_list.php">
+                                <img src="../img/newcourse.png" alt="icon" class="side-icon">
+                                ثبت نام دوره جدید
+                            </a>
                         </li>
-                        <li>
-                            <img src="../img/newcourse.png" alt="icon" class="side-icon">
-                            ثبت نام دوره جدید
-                        </li>
-                        <li>
-                            <img src="../img/settings.png" alt="icon" class="side-icon">
-                            تنظیمات حساب کاربری
+                        <li><a href="conf.php">
+                                <img src="../img/settings.png" alt="icon" class="side-icon">
+                                تنظیمات حساب کاربری
+                            </a>
                         </li>
                         <li><a href="logout.php">
                                 <img src="../img/signout.png" alt="icon" class="side-icon">
@@ -107,7 +104,7 @@ if (!mysqli_connect_error()) {
             <div class="courses box">
                 <div class="header">
                     <img src="../img/notif.png" alt="icon">
-                    دوره های آموزشی شما
+                    دوره های آموزشی من
                     <span class="mycourse-pager">
                                     <?php
                                     include("mycourses_pager.php");
@@ -168,21 +165,23 @@ if (!mysqli_connect_error()) {
                 </table>
             </div>
             <div class="row options">
-
                 <div class="col-md-2 col-sm-4 col-xs-6  text-center option">
-                    <a href="course_list.php">
+                    <a href="allcourse_list.php">
                         <img src="../img/course-list.png" alt="فهرست دوره ها">
                         <div>فهرست دوره ها</div>
                     </a>
                 </div>
-
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
+                    <a href="finished_list.php">
                     <img src="../img/license.png" alt="گواهینامه ها">
                     <div>گواهینامه ها</div>
+                    </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
+                    <a href="topics.php">
                     <img src="../img/topic.png" alt="سرفصل دوره ها">
                     <div>سرفصل دوره ها</div>
+                    </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
                     <img src="../img/viredu.png" alt="آموزش مجازی">
@@ -193,8 +192,10 @@ if (!mysqli_connect_error()) {
                     <div>مرکز دانلود</div>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
+                    <a href="contact.php">
                     <img src="../img/support.png" alt="پشتیبانی">
                     <div>پشتیبانی</div>
+                    </a>
                 </div>
             </div>
             <h4 class="font-weight-bold text-center">جدید ترین دوره های آموزش و همایش های بورس</h4>
@@ -234,7 +235,7 @@ if (!mysqli_connect_error()) {
                     if ($remaining_cap == "0") $remaining_cap = "<span class='txt-red'>تکمیل</span>";
                     echo '<div><span>ظرفیت باقی مانده: </span><span>' . $remaining_cap . '</span></div>';
                     echo '<div><span>محل برگزاری: </span><span>تهران</span></div>';
-                    if ($remaining_cap)
+                    if ($remaining_cap && $remaining_cap != "<span class='txt-red'>تکمیل</span>")
                         echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-submit">ثبت نام</a></div></div></div>';
                     else
                         echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-reserve">رزرو</a></div></div></div>';

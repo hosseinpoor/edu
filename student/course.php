@@ -2,22 +2,74 @@
 session_start();
 include_once("../strings.php");
 $session = false;
-if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
-    $session = true;
+$order = false;
+function getSubmitCount($id, $db)
+{
+    $sql = "SELECT * FROM orders WHERE courseId = " . $id . " AND active = 1 AND status = 1";
+    $result = mysqli_query($db, $sql);
+    return mysqli_num_rows($result);
+}
 
-    $db = @mysqli_connect("localhost", "root", "", "ebbroker");
-    if (!mysqli_connect_error()) {
-        mysqli_query($db, "SET NAMES utf8");
-        $sql = "SELECT * FROM students WHERE email = '" . $_SESSION['semail'] . "'";
-        $result = mysqli_query($db, $sql);
-        $student = mysqli_fetch_assoc($result);
-
+function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
+{
+    if ($jy > 979) {
+        $gy = 1600;
+        $jy -= 979;
     } else {
-        echo "<script>
-                alert('".$db_error."');
+        $gy = 621;
+    }
+    $days = (365 * $jy) + (((int)($jy / 33)) * 8) + ((int)((($jy % 33) + 3) / 4)) + 78 + $jd + (($jm < 7) ? ($jm - 1) * 31 : (($jm - 7) * 30) + 186);
+    $gy += 400 * ((int)($days / 146097));
+    $days %= 146097;
+    if ($days > 36524) {
+        $gy += 100 * ((int)(--$days / 36524));
+        $days %= 36524;
+        if ($days >= 365) $days++;
+    }
+    $gy += 4 * ((int)($days / 1461));
+    $days %= 1461;
+    if ($days > 365) {
+        $gy += (int)(($days - 1) / 365);
+        $days = ($days - 1) % 365;
+    }
+    $gd = $days + 1;
+    foreach (array(0, 31, (($gy % 4 == 0 and $gy % 100 != 0) or ($gy % 400 == 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31) as $gm => $v) {
+        if ($gd <= $v) break;
+        $gd -= $v;
+    }
+    return ($mod == '') ? array($gy, $gm, $gd) : $gy . $mod . $gm . $mod . $gd;
+}
+
+$db = @mysqli_connect("localhost", "root", "", "ebbroker");
+if (!mysqli_connect_error()) {
+    mysqli_query($db, "SET NAMES utf8");
+
+    $discountCode = "";
+    $s = "SELECT * FROM course WHERE courseId = " . $_GET['id'];
+    $r = mysqli_query($db, $s);
+    $course = mysqli_fetch_assoc($r);
+
+    $sq = "SELECT name , family FROM teachers WHERE email = '" . $course['teacherMail'] . "'";
+    $rs = mysqli_query($db, $sq);
+    $teacher = mysqli_fetch_assoc($rs);
+
+} else {
+    echo "<script>
+                alert('" . $db_error . "');
                 window.location.href='courses.php';
                 </script>";
-    }
+}
+
+if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
+    $session = true;
+    $sql = "SELECT * FROM students WHERE email = '" . $_SESSION['semail'] . "'";
+    $result = mysqli_query($db, $sql);
+    $student = mysqli_fetch_assoc($result);
+
+    $ss = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
+    $res = mysqli_query($db, $ss);
+    if (mysqli_num_rows($res) > 0)
+        $order = true;
 }
 ?>
 
@@ -86,7 +138,7 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
 
                 <?php
                 if ($student['image'] == "NULL" || $student['image'] == "")
-                    echo '<img src="../img/avatar.png" class="avatar" alt="avatar">';
+                    echo '<a href="panel.php"><img src="../img/avatar.png" class="avatar" alt="avatar"></a>';
                 else
                     echo '<img src="../' . $student['image'] . '" class="avatar" alt="avatar">';
                 ?>
@@ -98,27 +150,24 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
                             <img src="../img/envelope.png" alt="icon" class="side-icon">
                             پیام ها
                         </li>
-                        <li><a href="course_list.php">
-                                <img src="../img/overtime.png" alt="icon" class="side-icon">
-                                برنامه کلاس ها
-                            </a>
+                        <li>
+                            <img src="../img/overtime.png" alt="icon" class="side-icon">
+                            برنامه کلاس ها
                         </li>
                         <li><a href="finished_list.php">
                                 <img src="../img/finished.png" alt="icon" class="side-icon">
-                                دوره های پایان یافته
+                                دوره های پایان یافته من
                             </a>
                         </li>
-                        <li>
-                            <img src="../img/payments.png" alt="icon" class="side-icon">
-                            پرداخت ها
+                        <li><a href="course_list.php">
+                                <img src="../img/newcourse.png" alt="icon" class="side-icon">
+                                ثبت نام دوره جدید
+                            </a>
                         </li>
-                        <li>
-                            <img src="../img/newcourse.png" alt="icon" class="side-icon">
-                            ثبت نام دوره جدید
-                        </li>
-                        <li>
+                        <li><a href="conf.php">
                             <img src="../img/settings.png" alt="icon" class="side-icon">
                             تنظیمات حساب کاربری
+                            </a>
                         </li>
                         <li><a href="logout.php">
                                 <img src="../img/signout.png" alt="icon" class="side-icon">
@@ -132,364 +181,640 @@ if (isset($_SESSION['semail']) && !empty($_SESSION['semail'])) {
         </div>
         <div class="col-lg-9 text-right">
 
-            <?php
+            <div class="course-title">
+                عنوان : <?php echo $course['title'] ?>
+            </div>
 
-            function getSubmitCount($id, $db)
-            {
-                $sql = "SELECT * FROM orders WHERE courseId = " . $id . " AND active = 1 AND status = 1";
-                $result = mysqli_query($db, $sql);
-                return mysqli_num_rows($result);
-            }
+            <div class="row course-banner">
+                <div class="col-md-8 banner"><img src="../img/banner.jpg" alt="اقتصاد بیدار"></div>
+                <div class="col-md-4 text-center">
+                    <div class="title pt-5"><?php echo $course['title'] ?></div>
+                    <div class="teacher">استاد : <?php echo $teacher['name'] . " " . $teacher['family'] ?></div>
+                </div>
+            </div>
 
-            function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
-            {
-                if ($jy > 979) {
-                    $gy = 1600;
-                    $jy -= 979;
-                } else {
-                    $gy = 621;
-                }
-                $days = (365 * $jy) + (((int)($jy / 33)) * 8) + ((int)((($jy % 33) + 3) / 4)) + 78 + $jd + (($jm < 7) ? ($jm - 1) * 31 : (($jm - 7) * 30) + 186);
-                $gy += 400 * ((int)($days / 146097));
-                $days %= 146097;
-                if ($days > 36524) {
-                    $gy += 100 * ((int)(--$days / 36524));
-                    $days %= 36524;
-                    if ($days >= 365) $days++;
-                }
-                $gy += 4 * ((int)($days / 1461));
-                $days %= 1461;
-                if ($days > 365) {
-                    $gy += (int)(($days - 1) / 365);
-                    $days = ($days - 1) % 365;
-                }
-                $gd = $days + 1;
-                foreach (array(0, 31, (($gy % 4 == 0 and $gy % 100 != 0) or ($gy % 400 == 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31) as $gm => $v) {
-                    if ($gd <= $v) break;
-                    $gd -= $v;
-                }
-                return ($mod == '') ? array($gy, $gm, $gd) : $gy . $mod . $gm . $mod . $gd;
-            }
+            <div class="alert alert-danger alert-dismissible show">
+                توجه : دوستانی که کد معاملاتی از کارگزاری دریافت کنند از تخفیف دوره بهره مند میشوند
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+            <div class="alert alert-danger alert-dismissible show">
+                توجه : در صورت عدم رسیدن به حد نصاب این تاریخ ممکن است به تاویق بیوفتد، توجه داشته باشید که پس از قطعی
+                شدن تاریخ شروع کلاس با شما تماس گرفته خواهد شد
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
 
-            $discountCode = "";
-            $sql = "SELECT * FROM course WHERE courseId = " . $_GET['id'];
-            $result = mysqli_query($db, $sql);
-            $row = mysqli_fetch_assoc($result);
-            echo "<div>" . "عنوان : " . $row['title'] . "</div><br>";
+            <div>
+                <br>
+                <h3>توضیحات: </h3>
+                <div> <?php echo str_replace("&nbsp;", " ", htmlspecialchars_decode(stripslashes($course['description']))) ?> </div>
+                <br>
+                <h3>سرفصل دوره: </h3>
+                <div> <?php if ($course['topicText'] != "" and $course['topicText'] != null) echo str_replace("&nbsp;", " ", htmlspecialchars_decode(stripslashes($course['topicText']))); else echo "ندارد" ?> </div>
+                <br>
+            </div>
+            <div class="row course-details">
+                <div class="col-md-4 border-left">
+                    <div class="mt-3"><img class="icon" src="../img/date.png" alt=""> تاریخ شروع دوره
+                        : <span><?php echo str_replace("-", "/", $course['startDate']) ?></span></div>
+                    <div class="mt-3"><img class="icon" src="../img/date.png" alt=""> تاریخ پایان دوره
+                        : <span><?php echo str_replace("-", "/", $course['endDate']) ?></span></div>
+                    <div class="mt-3"><img class="icon" src="../img/holdingdays.png" alt=""> روز های برگزاری :</div>
+                    <div class="mt-3 mr-3"><?php echo $course['holdingDays'] ?></div>
+                    <div class="mt-3"><img class="icon" src="../img/cost.png" alt=""> هزینه دوره
+                        <small>(به ریال):</small>
+                    </div>
+                    <?php
 
-            echo "<div>" . "توضیحات : " . "</div><br><div>";
-            echo str_replace("&nbsp;", " ", htmlspecialchars_decode(stripslashes($row['description'])));
-            echo "</div>";
+                    if ($course['cost']) {
+                        if ($session && $order) {
 
-            if ($row['startDate'] != null && $row['startDate'] != "")
-                echo "تاریخ شروع : " . $row['startDate'] . "<span class='txt-red'> در صورت عدم رسیدن به حد نصاب این تاریخ ممکن است به تعویق بیافتد. توجه داشته باشید که پس از قطعی شدن تاریخ شروع کلاس با شما تماس گرفته خواهد شد.</span>" . "<br>";
-            if ($row['endDate'] != null && $row['endDate'] != "")
-                echo "تاریخ پایان : " . $row['endDate'] . "<br>";
-            if ($row['holdingDays'] != null && $row['holdingDays'] != "")
-                echo "روز های برگزاری : " . $row['holdingDays'] . "<br>";
-            if ($row['capacity'] != null && $row['capacity'] != "" && $row['capacity'] != "0")
-                echo "ظرفیت : " . $row['capacity'] . "<br>";
-            else if ($row['capacity'] == "0")
-                echo "ظرفیت : " . "<span class='txt-red'>تکمیل</span>" . "<br>";
-            if ($row['quorum'] != null && $row['quorum'] != "")
-                echo "حد نصاب : " . $row['quorum'] . "<br>";
-            if ($row['topicText'] != null && $row['topicText'] != "")
-                echo "سرفصل ها : " . $row['topicText'] . "<br>";
-            ($row['capacity'] == NULL) ? $remaining_cap = 999999 : $remaining_cap = intval($row['capacity']) - intval(getSubmitCount($row['courseId'], $db));
-
-            if (!empty($_SESSION['semail'])) {
-                if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
-                    $reagent = base64_decode($_GET['reagent']);
-                    $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
-                    $result = mysqli_query($db, $sql);
-
-                    if (mysqli_num_rows($result) > 0) {
-
-                        $res = mysqli_fetch_assoc($result);
-                        if ($row['cost']) {
-                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                            echo "<span class='pr-2' id='finalCost'>";
-
-                            if (isset($res['discountId']) && !empty($res['discountId'])) {
-                                $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
+                            $ss = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
+                            $res = mysqli_query($db, $ss);
+                            $rs = mysqli_fetch_assoc($res);
+                            if (isset($rs['discountId']) && !empty($rs['discountId'])) {
+                                $s = "SELECT * FROM discount WHERE discountId = " . $rs['discountId'];
                                 $r = mysqli_query($db, $s);
                                 $count = mysqli_num_rows($r);
                                 if ($count == 1) {
                                     $res = mysqli_fetch_assoc($r);
                                     if ($res['isRial']) {
-                                        echo " میزان تخفیف : " . $res['amount'] . " ریال";
+                                        $final = intval($course['cost']) - intval($res['amount']);
+                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
                                     } else {
-                                        echo " میزان تخفیف : " . $res['amount'] . " درصد";
+                                        $final = intval($course['cost']) - (intval($course['cost']) * (intval($res['amount']) / 100));
+                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
                                     }
                                 }
-                            }
-
-                            echo "</span> <br>";
+                            } else
+                                echo '<div class="cost" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost"></span></div>';
 
                         } else {
-                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
-                        }
+                            if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
 
-                    } else {
-                        if ($row['cost']) {
-                            $finalCost = $row['cost'];
-                            $sql = "SELECT * FROM discount WHERE code = '" . $reagent . "' AND courseId = " . $_GET['id'];
-                            $result = mysqli_query($db, $sql);
-                            $count = mysqli_num_rows($result);
-                            if ($count == 1) {
-                                $res = mysqli_fetch_assoc($result);
-                                $start = $res['startDate'];
-                                $startY = substr($start, 0, 4);
-                                $startM = substr($start, 5, 2);
-                                $startD = substr($start, 8, 2);
-                                $startG = jalali_to_gregorian($startY, $startM, $startD, "-");
-                                $end = $res['endDate'];
-                                $endY = substr($end, 0, 4);
-                                $endM = substr($end, 5, 2);
-                                $endD = substr($end, 8, 2);
-                                $endG = jalali_to_gregorian($endY, $endM, $endD, "-");
-                                $today = date("Y-m-d");
+                                $reagent = base64_decode($_GET['reagent']);
+                                $sql = "SELECT * FROM discount WHERE code = '" . $reagent . "' AND courseId = " . $_GET['id'];
+                                $result = mysqli_query($db, $sql);
+                                $count = mysqli_num_rows($result);
+                                if ($count == 1) {
+                                    $res = mysqli_fetch_assoc($result);
+                                    $start = $res['startDate'];
+                                    $startY = substr($start, 0, 4);
+                                    $startM = substr($start, 5, 2);
+                                    $startD = substr($start, 8, 2);
+                                    $startG = jalali_to_gregorian($startY, $startM, $startD, "-");
+                                    $end = $res['endDate'];
+                                    $endY = substr($end, 0, 4);
+                                    $endM = substr($end, 5, 2);
+                                    $endD = substr($end, 8, 2);
+                                    $endG = jalali_to_gregorian($endY, $endM, $endD, "-");
+                                    $today = date("Y-m-d");
 
-                                if ($res['isRial'] == 1) {
-                                    if ($today >= $startG && $today <= $endG)
-                                        $finalCost = $row['cost'] - $res['amount'];
+                                    if ($res['isRial']) {
+                                        $final = intval($course['cost']) - intval($res['amount']);
+                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
+                                    } else {
+                                        $final = intval($course['cost']) - (intval($course['cost']) * (intval($res['amount']) / 100));
+                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
+                                    }
+                                    $discountCode = $reagent;
                                 } else {
-                                    if ($today >= $startG && $today <= $endG)
-                                        $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
+                                    echo '<div class="cost" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost"></span></div>';
                                 }
-                                echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                                echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
-                                echo "<br>";
-                                $discountCode = $reagent;
 
                             } else {
-                                echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                                echo "<br>";
+                                echo '<div class="cost" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost"></span></div>';
                             }
-
-                        } else {
-                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
                         }
-                    }
-
-                } else {
-                    $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
-                    $result = mysqli_query($db, $sql);
-
-                    if (mysqli_num_rows($result) > 0) {
-
-                        $res = mysqli_fetch_assoc($result);
-                        if ($row['cost']) {
-                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                            echo "<span class='pr-2' id='finalCost'>";
-
-                            if (isset($res['discountId']) && !empty($res['discountId'])) {
-                                $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
-                                $r = mysqli_query($db, $s);
-                                $count = mysqli_num_rows($r);
-                                if ($count == 1) {
-                                    $res = mysqli_fetch_assoc($r);
-                                    if ($res['isRial']) {
-                                        echo " میزان تخفیف : " . $res['amount'] . " ریال";
-                                    } else {
-                                        echo " میزان تخفیف : " . $res['amount'] . " درصد";
-                                    }
-                                }
-                            }
-
-                            echo "</span> <br>";
-
-                        } else {
-                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
-                        }
-
                     } else {
-
-                        if ($row['cost']) {
-                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                            echo "<span class='pr-2' id='finalCost'></span>";
-                            echo "<br>";
-
-                            echo '
-                    <span>نوع تخفیف:</span>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="none" class="form-check-input" id="disNone" name="disType" checked="checked"> هیچ کدام
-                    </label>
-                    </div>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="code" class="form-check-input" id="disCode" name="disType"> کد تخفیف
-                    </label>
-                    </div>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="file" class="form-check-input" id="disFile" name="disType"> دانشجویی
-                    </label>
-                    </div>
-                    <br>';
-
-                            echo '<div class="needFile">';
-                            echo '<span>آپلود کارت دانشجویی  : </span>
-                    <input type="file" class="border" name="neededFile" id="neededFile"
-                    title="فایل بروشور">
-                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
-                            echo '</div>';
-
-                            echo '<div class="needCode">';
-                            echo '<label for="discount">کد تخفیف:</label>
-                    <input type="text"  id="discount">
-                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
-                            echo '</div>';
-
-                            echo '
-                    <span>نوع پرداخت:</span>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="receipt" class="form-check-input" name="payType" checked="checked"> آپلود فیش واریزی
-                    </label>
-                    </div>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="online" class="form-check-input" name="payType"> پرداخت آنلاین
-                    </label>
-                    </div>
-                    <br>';
-
-                            echo '<div>';
-                            echo '<span>آپلود فیش واریزی  : </span>
-                    <input type="file" class="border" name="receipt" id="receipt"
-                    title="فایل بروشور">
-                    </div>';
-
-                        } else {
-                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
-                        }
-
+                        echo '<div class="free">رایگان</div>';
                     }
-                }
-            } else {
-                if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
-                    $reagent = base64_decode($_GET['reagent']);
-                    if ($row['cost']) {
 
-                        $finalCost = $row['cost'];
-                        $sql = "SELECT * FROM discount WHERE code = '" . $reagent . "' AND courseId = " . $_GET['id'];
-                        $result = mysqli_query($db, $sql);
-                        $count = mysqli_num_rows($result);
-                        if ($count == 1) {
-                            $res = mysqli_fetch_assoc($result);
-                            $start = $res['startDate'];
-                            $startY = substr($start, 0, 4);
-                            $startM = substr($start, 5, 2);
-                            $startD = substr($start, 8, 2);
-                            $startG = jalali_to_gregorian($startY, $startM, $startD, "-");
-                            $end = $res['endDate'];
-                            $endY = substr($end, 0, 4);
-                            $endM = substr($end, 5, 2);
-                            $endD = substr($end, 8, 2);
-                            $endG = jalali_to_gregorian($endY, $endM, $endD, "-");
-                            $today = date("Y-m-d");
 
-                            if ($res['isRial'] == 1) {
-                                if ($today >= $startG && $today <= $endG)
-                                    $finalCost = $row['cost'] - $res['amount'];
+                    //                    if ($session) {
+                    //                        $ss = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
+                    //                        $res = mysqli_query($db, $ss);
+                    //                        $rs = mysqli_fetch_assoc($res);
+                    //                        if ($course['cost']) {
+                    //                            if (isset($rs['discountId']) && !empty($rs['discountId'])) {
+                    //                                $s = "SELECT * FROM discount WHERE discountId = " . $rs['discountId'];
+                    //                                $r = mysqli_query($db, $s);
+                    //                                $count = mysqli_num_rows($r);
+                    //                                if ($count == 1) {
+                    //                                    $res = mysqli_fetch_assoc($r);
+                    //                                    if ($res['isRial']) {
+                    //                                        $final = intval($course['cost']) - intval($res['amount']);
+                    //                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
+                    //                                    } else {
+                    //                                        $final = intval($course['cost']) - (intval($course['cost']) * (intval($res['amount']) / 100));
+                    //                                        echo '<div class="cost invalid" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost" style="display: block">' . $final . '</span></div>';
+                    //                                    }
+                    //                                }
+                    //                            } else
+                    //                                echo '<div class="cost" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost"></span></div>';
+                    //                        } else {
+                    //                            echo '<div class="free">رایگان</div>';
+                    //                        }
+                    //                    } else {
+                    //                    if ($course['cost']) {
+                    //                        if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
+                    //                            $reagent = base64_decode($_GET['reagent']);
+                    //                            $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
+                    //                            $result = mysqli_query($db, $sql);
+                    //                            if (mysqli_num_rows($result) > 0) {
+                    //                                $res = mysqli_fetch_assoc($result);
+                    //                                if (isset($res['discountId']) && !empty($res['discountId'])) {
+                    //                                    $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
+                    //                                    $r = mysqli_query($db, $s);
+                    //                                    $count = mysqli_num_rows($r);
+                    //                                    if ($count == 1) {
+                    //                                        $res = mysqli_fetch_assoc($r);
+                    //                                        if ($res['isRial']) {
+                    //                                            echo " میزان تخفیف : " . $res['amount'] . " ریال";
+                    //                                        } else {
+                    //                                            echo " میزان تخفیف : " . $res['amount'] . " درصد";
+                    //                                        }
+                    //                                    }
+                    //                                }
+                    //
+                    //                                echo '<div class="cost" id="realCost">' . $course['cost'] . ' <span class="dis" id="finalCost"></span></div>';
+                    //                            }
+                    //                        } else {
+                    //                            echo '<div class="free">رایگان</div>';
+                    //                        }
+                    //                    }
+
+
+                    ?>
+
+                </div>
+                <div class="col-md-4  border-left">
+                    <div class="mt-3"><img class="icon" src="../img/tag.png" alt=""> نوع تخفیف :</div>
+                    <div class="mt-3">
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" value="none" class="form-check-input" id="disNone" name="disType"
+                                       checked="checked"> هیچ کدام
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" value="code" class="form-check-input" id="disCode" name="disType">
+                                کد تخفیف
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" value="file" class="form-check-input" id="disFile" name="disType">
+                                دانشجویی
+                            </label>
+                        </div>
+
+                        <div class="needFile mt-3 mr-3">
+                            <label for="neededFile" class="needFileLable">آپلود کارت دانشجویی</label>
+                            <input type="file" name="neededFile" id="neededFile" title="آپلود کارت دانشجویی">
+                            <?php echo '<button id="discountFileBtn" class="btn btn-test" name="submit" value="submit"
+                                    cost="' . $course['cost'] . '" courseId="' . $_GET['id'] . '">اعتبار سنجی فایل
+                            </button>'; ?>
+                            <br>
+                        </div>
+                        <div class="needCode mt-3 mr-3">
+                            <input type="text" id="discount">
+                            <?php echo '<button id="discountCodeBtn" class="btn btn-test" name="submit" value="submit"
+                                    cost="' . $course['cost'] . '" courseId="' . $_GET['id'] . '">بررسی
+                            </button>'; ?>
+                            <br>
+                        </div>
+
+                        <div class="mt-3"><img class="icon" src="../img/pay.png" alt=""> نوع پرداخت :</div>
+
+                        <div class="mt-3">
+                            <div class="form-check-inline">
+                                <label class="form-check-label">
+                                    <input type="radio" value="receipt" class="form-check-input" name="payType"
+                                           checked="checked"> آپلود فیش واریزی
+                                </label>
+                            </div>
+                            <div class="form-check-inline">
+                                <label class="form-check-label">
+                                    <input type="radio" value="online" class="form-check-input" name="payType"> پرداخت
+                                    آنلاین
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 mr-3">
+                            <label for="receipt" class="needFileLable myform">آپلود فیش واریزی</label>
+                            <input type="file" class="border" name="receipt" id="receipt"
+                                   title="آپلود فیش واریزی">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mt-3"><img class="icon" src="../img/cap.png" alt=""> ظرفیت دوره
+                        :
+                        <span><?php if ($course['capacity']) echo $course['capacity'] . " نفر "; else echo "نامحدود" ?></span>
+                    </div>
+                    <div class="mt-3"><img class="icon" src="../img/cap.png" alt=""> حد نصاب
+                        :
+                        <span><?php if ($course['quorum']) echo $course['quorum'] . " نفر "; else echo "ندارد" ?></span>
+                    </div>
+                    <br><br><br><br><br>
+                    <div class="btns">
+                        <div class="row" style="padding: 0">
+                            <div class="col-sm-6 mt-3" style="padding: 0"><a role="button" target="_blank"
+                                                                             href="<?php if ($course['topicFile']) echo "../" . $course['topicFile'] ?>"
+                                                                             class="btn topic <?php if (!$course['topicFile']) echo "disabled" ?>">فایل
+                                    سرفصل ها</a></div>
+                            <div class="col-sm-6 mt-3" style="padding: 0"><a role="button" target="_blank"
+                                                                             href="<?php if ($course['brochureFile']) echo "../" . $course['brochureFile'] ?>"
+                                                                             class="btn brochure <?php if (!$course['brochureFile']) echo "disabled" ?>">فایل
+                                    بروشور</a></div>
+                        </div>
+                        <?php
+                        if ($session) {
+                            $ss = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
+                            $res = mysqli_query($db, $ss);
+                            ($course['capacity'] == NULL) ? $remaining_cap = 999999 : $remaining_cap = intval($course['capacity']) - intval(getSubmitCount($course['courseId'], $db));
+                            if (mysqli_num_rows($res) > 0) {
+                                echo '<button id="removeBtn" class="btn register" name="remove" value="remove" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">حذف کلاس</button>';
                             } else {
-                                if ($today >= $startG && $today <= $endG)
-                                    $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
+                                if (intval($remaining_cap) > 0)
+                                    echo '<button id="submitBtn" class="btn register" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">ثبت کلاس</button>';
+                                else
+                                    echo '<button id="submitBtn" class="btn reserve" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">رزرو</button>';
+
                             }
-                            echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                            echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
-                            echo "<br>";
-                            $discountCode = $reagent;
-
                         } else {
-                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                            echo "<br>";
+                            if (isset($_GET['reagent']) && !empty($_GET['reagent']))
+                                echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>ثبت نام کنید</a>." . "</span>";
+                            else
+                                echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "'>ثبت نام کنید</a>." . "</span>";
+
                         }
-
-                    } else {
-                        echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
-                    }
-                } else {
-                    if ($row['cost']) {
-                        echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
-                        echo "<span class='pr-2' id='finalCost'></span>";
-                        echo "<br>";
-
-                        echo '
-                    <span>نوع تخفیف:</span>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="none" class="form-check-input" name="disType" checked="checked"> هیچ کدام
-                    </label>
+                        ?>
                     </div>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="code" class="form-check-input" name="disType"> کد تخفیف
-                    </label>
-                    </div>
-                    <div class="form-check-inline">
-                    <label class="form-check-label">
-                    <input type="radio" value="file" class="form-check-input" name="disType"> نیازمند فایل
-                    </label>
-                    </div>
-                    <br>';
+                </div>
+            </div>
 
-                        echo '<div class="needFile">';
-                        echo '<span>آپلود فایل  : </span>
-                    <input type="file" class="border" name="neededFile" id="neededFile"
-                    title="فایل بروشور">
-                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
-                        echo '</div>';
-
-                        echo '<div class="needCode">';
-                        echo '<label for="discount">کد تخفیف:</label>
-                    <input type="text"  id="discount">
-                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
-                        echo '</div>';
-
-                    } else {
-                        echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
-                    }
-                }
-
-            }
-
-            if ($row["topicFile"] != Null)
-                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="' . $row['topicFileName'] . '">فایل سرفصل ها</a> ';
-            else
-                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
-            if ($row["brochureFile"] != Null)
-                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="' . $row['brochureFileName'] . '">فایل بروشور</a>' . "<br>";
-            else
-                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
-            echo "<br>";
-
-            if (!empty($_SESSION['semail'])) {
-                $sql = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
-                $result = mysqli_query($db, $sql);
-                if (mysqli_num_rows($result) > 0) {
-                    echo '<button id="removeBtn" class="btn btn-danger" name="remove" value="remove" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">حذف کلاس</button>';
-                    $res = mysqli_fetch_assoc($result);
-                    if ($res['status'] == 1 && $res['verify'] == 1)
-                        echo '<a href="card.php?id=' . $_GET['id'] . '" class="btn btn-success mr-1" role="button">دریافت کارت ورود به جلسه</a>';
-                } else {
-                    if (intval($remaining_cap) > 0)
-                        echo '<button id="submitBtn" class="btn btn-success" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">ثبت کلاس</button>';
-                    else
-                        echo '<button id="submitBtn" class="btn btn-warning" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">رزرو</button>';
-
-                }
-            } else {
-                if (isset($_GET['reagent']) && !empty($_GET['reagent']))
-                    echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>ثبت نام کنید</a>." . "</span>";
-                else
-                    echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "'>ثبت نام کنید</a>." . "</span>";
-
-            }
-
-            ?>
+            <!--            --><?php
+            //
+            //            function getSubmitCount($id, $db)
+            //            {
+            //                $sql = "SELECT * FROM orders WHERE courseId = " . $id . " AND active = 1 AND status = 1";
+            //                $result = mysqli_query($db, $sql);
+            //                return mysqli_num_rows($result);
+            //            }
+            //
+            //            function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
+            //            {
+            //                if ($jy > 979) {
+            //                    $gy = 1600;
+            //                    $jy -= 979;
+            //                } else {
+            //                    $gy = 621;
+            //                }
+            //                $days = (365 * $jy) + (((int)($jy / 33)) * 8) + ((int)((($jy % 33) + 3) / 4)) + 78 + $jd + (($jm < 7) ? ($jm - 1) * 31 : (($jm - 7) * 30) + 186);
+            //                $gy += 400 * ((int)($days / 146097));
+            //                $days %= 146097;
+            //                if ($days > 36524) {
+            //                    $gy += 100 * ((int)(--$days / 36524));
+            //                    $days %= 36524;
+            //                    if ($days >= 365) $days++;
+            //                }
+            //                $gy += 4 * ((int)($days / 1461));
+            //                $days %= 1461;
+            //                if ($days > 365) {
+            //                    $gy += (int)(($days - 1) / 365);
+            //                    $days = ($days - 1) % 365;
+            //                }
+            //                $gd = $days + 1;
+            //                foreach (array(0, 31, (($gy % 4 == 0 and $gy % 100 != 0) or ($gy % 400 == 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31) as $gm => $v) {
+            //                    if ($gd <= $v) break;
+            //                    $gd -= $v;
+            //                }
+            //                return ($mod == '') ? array($gy, $gm, $gd) : $gy . $mod . $gm . $mod . $gd;
+            //            }
+            //
+            //            $discountCode = "";
+            //            $sql = "SELECT * FROM course WHERE courseId = " . $_GET['id'];
+            //            $result = mysqli_query($db, $sql);
+            //            $row = mysqli_fetch_assoc($result);
+            //            echo "<div>" . "عنوان : " . $row['title'] . "</div><br>";
+            //
+            //            echo "<div>" . "توضیحات : " . "</div><br><div>";
+            //            echo str_replace("&nbsp;", " ", htmlspecialchars_decode(stripslashes($row['description'])));
+            //            echo "</div>";
+            //
+            //            if ($row['startDate'] != null && $row['startDate'] != "")
+            //                echo "تاریخ شروع : " . $row['startDate'] . "<span class='txt-red'> در صورت عدم رسیدن به حد نصاب این تاریخ ممکن است به تعویق بیافتد. توجه داشته باشید که پس از قطعی شدن تاریخ شروع کلاس با شما تماس گرفته خواهد شد.</span>" . "<br>";
+            //            if ($row['endDate'] != null && $row['endDate'] != "")
+            //                echo "تاریخ پایان : " . $row['endDate'] . "<br>";
+            //            if ($row['holdingDays'] != null && $row['holdingDays'] != "")
+            //                echo "روز های برگزاری : " . $row['holdingDays'] . "<br>";
+            //            if ($row['capacity'] != null && $row['capacity'] != "" && $row['capacity'] != "0")
+            //                echo "ظرفیت : " . $row['capacity'] . "<br>";
+            //            else if ($row['capacity'] == "0")
+            //                echo "ظرفیت : " . "<span class='txt-red'>تکمیل</span>" . "<br>";
+            //            if ($row['quorum'] != null && $row['quorum'] != "")
+            //                echo "حد نصاب : " . $row['quorum'] . "<br>";
+            //            if ($row['topicText'] != null && $row['topicText'] != "")
+            //                echo "سرفصل ها : " . $row['topicText'] . "<br>";
+            //            ($row['capacity'] == NULL) ? $remaining_cap = 999999 : $remaining_cap = intval($row['capacity']) - intval(getSubmitCount($row['courseId'], $db));
+            //
+            //            if (!empty($_SESSION['semail'])) {
+            //                if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
+            //                    $reagent = base64_decode($_GET['reagent']);
+            //                    $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
+            //                    $result = mysqli_query($db, $sql);
+            //
+            //                    if (mysqli_num_rows($result) > 0) {
+            //
+            //                        $res = mysqli_fetch_assoc($result);
+            //                        if ($row['cost']) {
+            //                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                            echo "<span class='pr-2' id='finalCost'>";
+            //
+            //                            if (isset($res['discountId']) && !empty($res['discountId'])) {
+            //                                $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
+            //                                $r = mysqli_query($db, $s);
+            //                                $count = mysqli_num_rows($r);
+            //                                if ($count == 1) {
+            //                                    $res = mysqli_fetch_assoc($r);
+            //                                    if ($res['isRial']) {
+            //                                        echo " میزان تخفیف : " . $res['amount'] . " ریال";
+            //                                    } else {
+            //                                        echo " میزان تخفیف : " . $res['amount'] . " درصد";
+            //                                    }
+            //                                }
+            //                            }
+            //
+            //                            echo "</span> <br>";
+            //
+            //                        } else {
+            //                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                        }
+            //
+            //                    } else {
+            //                        if ($row['cost']) {
+            //                            $finalCost = $row['cost'];
+            //                            $sql = "SELECT * FROM discount WHERE code = '" . $reagent . "' AND courseId = " . $_GET['id'];
+            //                            $result = mysqli_query($db, $sql);
+            //                            $count = mysqli_num_rows($result);
+            //                            if ($count == 1) {
+            //                                $res = mysqli_fetch_assoc($result);
+            //                                $start = $res['startDate'];
+            //                                $startY = substr($start, 0, 4);
+            //                                $startM = substr($start, 5, 2);
+            //                                $startD = substr($start, 8, 2);
+            //                                $startG = jalali_to_gregorian($startY, $startM, $startD, "-");
+            //                                $end = $res['endDate'];
+            //                                $endY = substr($end, 0, 4);
+            //                                $endM = substr($end, 5, 2);
+            //                                $endD = substr($end, 8, 2);
+            //                                $endG = jalali_to_gregorian($endY, $endM, $endD, "-");
+            //                                $today = date("Y-m-d");
+            //
+            //                                if ($res['isRial'] == 1) {
+            //                                    if ($today >= $startG && $today <= $endG)
+            //                                        $finalCost = $row['cost'] - $res['amount'];
+            //                                } else {
+            //                                    if ($today >= $startG && $today <= $endG)
+            //                                        $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
+            //                                }
+            //                                echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                                echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
+            //                                echo "<br>";
+            //                                $discountCode = $reagent;
+            //
+            //                            } else {
+            //                                echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                                echo "<br>";
+            //                            }
+            //
+            //                        } else {
+            //                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                        }
+            //                    }
+            //
+            //                } else {
+            //                    $sql = "SELECT courseId , discountId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND status = 1";
+            //                    $result = mysqli_query($db, $sql);
+            //
+            //                    if (mysqli_num_rows($result) > 0) {
+            //
+            //                        $res = mysqli_fetch_assoc($result);
+            //                        if ($row['cost']) {
+            //                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                            echo "<span class='pr-2' id='finalCost'>";
+            //
+            //                            if (isset($res['discountId']) && !empty($res['discountId'])) {
+            //                                $s = "SELECT * FROM discount WHERE discountId = " . $res['discountId'];
+            //                                $r = mysqli_query($db, $s);
+            //                                $count = mysqli_num_rows($r);
+            //                                if ($count == 1) {
+            //                                    $res = mysqli_fetch_assoc($r);
+            //                                    if ($res['isRial']) {
+            //                                        echo " میزان تخفیف : " . $res['amount'] . " ریال";
+            //                                    } else {
+            //                                        echo " میزان تخفیف : " . $res['amount'] . " درصد";
+            //                                    }
+            //                                }
+            //                            }
+            //
+            //                            echo "</span> <br>";
+            //
+            //                        } else {
+            //                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                        }
+            //
+            //                    } else {
+            //
+            //                        if ($row['cost']) {
+            //                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                            echo "<span class='pr-2' id='finalCost'></span>";
+            //                            echo "<br>";
+            //
+            //                            echo '
+            //                    <span>نوع تخفیف:</span>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="none" class="form-check-input" id="disNone" name="disType" checked="checked"> هیچ کدام
+            //                    </label>
+            //                    </div>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="code" class="form-check-input" id="disCode" name="disType"> کد تخفیف
+            //                    </label>
+            //                    </div>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="file" class="form-check-input" id="disFile" name="disType"> دانشجویی
+            //                    </label>
+            //                    </div>
+            //                    <br>';
+            //
+            //                            echo '<div class="needFile">';
+            //                            echo '<span>آپلود کارت دانشجویی  : </span>
+            //                    <input type="file" class="border" name="neededFile" id="neededFile"
+            //                    title="آپلود کارت دانشجویی">
+            //                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
+            //                            echo '</div>';
+            //
+            //                            echo '<div class="needCode">';
+            //                            echo '<label for="discount">کد تخفیف:</label>
+            //                    <input type="text"  id="discount">
+            //                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+            //                            echo '</div>';
+            //
+            //                            echo '
+            //                    <span>نوع پرداخت:</span>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="receipt" class="form-check-input" name="payType" checked="checked"> آپلود فیش واریزی
+            //                    </label>
+            //                    </div>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="online" class="form-check-input" name="payType"> پرداخت آنلاین
+            //                    </label>
+            //                    </div>
+            //                    <br>';
+            //
+            //                            echo '<div>';
+            //                            echo '<span>آپلود فیش واریزی  : </span>
+            //                    <input type="file" class="border" name="receipt" id="receipt"
+            //                    title="فایل بروشور">
+            //                    </div>';
+            //
+            //                        } else {
+            //                            echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                        }
+            //
+            //                    }
+            //                }
+            //            } else {
+            //                if (isset($_GET['reagent']) && !empty($_GET['reagent'])) {
+            //                    $reagent = base64_decode($_GET['reagent']);
+            //                    if ($row['cost']) {
+            //
+            //                        $finalCost = $row['cost'];
+            //                        $sql = "SELECT * FROM discount WHERE code = '" . $reagent . "' AND courseId = " . $_GET['id'];
+            //                        $result = mysqli_query($db, $sql);
+            //                        $count = mysqli_num_rows($result);
+            //                        if ($count == 1) {
+            //                            $res = mysqli_fetch_assoc($result);
+            //                            $start = $res['startDate'];
+            //                            $startY = substr($start, 0, 4);
+            //                            $startM = substr($start, 5, 2);
+            //                            $startD = substr($start, 8, 2);
+            //                            $startG = jalali_to_gregorian($startY, $startM, $startD, "-");
+            //                            $end = $res['endDate'];
+            //                            $endY = substr($end, 0, 4);
+            //                            $endM = substr($end, 5, 2);
+            //                            $endD = substr($end, 8, 2);
+            //                            $endG = jalali_to_gregorian($endY, $endM, $endD, "-");
+            //                            $today = date("Y-m-d");
+            //
+            //                            if ($res['isRial'] == 1) {
+            //                                if ($today >= $startG && $today <= $endG)
+            //                                    $finalCost = $row['cost'] - $res['amount'];
+            //                            } else {
+            //                                if ($today >= $startG && $today <= $endG)
+            //                                    $finalCost = $row['cost'] - ($res['amount'] * $row['cost']) / 100;
+            //                            }
+            //                            echo "<span class='invalid' id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                            echo "<span class='pr-2' id='finalCost'>هزینه برای شما : " . $finalCost . " ریال" . "</span>";
+            //                            echo "<br>";
+            //                            $discountCode = $reagent;
+            //
+            //                        } else {
+            //                            echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                            echo "<br>";
+            //                        }
+            //
+            //                    } else {
+            //                        echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                    }
+            //                } else {
+            //                    if ($row['cost']) {
+            //                        echo "<span id='realCost'>" . "هزینه : " . $row['cost'] . " ریال " . "</span>";
+            //                        echo "<span class='pr-2' id='finalCost'></span>";
+            //                        echo "<br>";
+            //
+            //                        echo '
+            //                    <span>نوع تخفیف:</span>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="none" class="form-check-input" name="disType" checked="checked"> هیچ کدام
+            //                    </label>
+            //                    </div>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="code" class="form-check-input" name="disType"> کد تخفیف
+            //                    </label>
+            //                    </div>
+            //                    <div class="form-check-inline">
+            //                    <label class="form-check-label">
+            //                    <input type="radio" value="file" class="form-check-input" name="disType"> نیازمند فایل
+            //                    </label>
+            //                    </div>
+            //                    <br>';
+            //
+            //                        echo '<div class="needFile">';
+            //                        echo '<span>آپلود فایل  : </span>
+            //                    <input type="file" class="border" name="neededFile" id="neededFile"
+            //                    title="فایل بروشور">
+            //                    <button id="discountFileBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >اعتبار سنجی فایل</button> <br> ';
+            //                        echo '</div>';
+            //
+            //                        echo '<div class="needCode">';
+            //                        echo '<label for="discount">کد تخفیف:</label>
+            //                    <input type="text"  id="discount">
+            //                    <button id="discountCodeBtn" class="btn btn-primary" name="submit" value="submit" cost="' . $row['cost'] . '" courseId="' . $_GET['id'] . '" >بررسی تخفیف</button> <br> ';
+            //                        echo '</div>';
+            //
+            //                    } else {
+            //                        echo "هزینه : " . "<span class='txt-red'>رایگان</span>" . "<br>";
+            //                    }
+            //                }
+            //
+            //            }
+            //
+            //            if ($row["topicFile"] != Null)
+            //                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info" role="button" download="' . $row['topicFileName'] . '">فایل سرفصل ها</a> ';
+            //            else
+            //                echo '<a href="../' . $row["topicFile"] . '" class="btn btn-info disabled" role="button">فایل سرفصل ها</a> ';
+            //            if ($row["brochureFile"] != Null)
+            //                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info" role="button" download="' . $row['brochureFileName'] . '">فایل بروشور</a>' . "<br>";
+            //            else
+            //                echo '<a href="../' . $row["brochureFile"] . '" class="btn btn-info disabled" role="button">فایل بروشور</a>' . "<br>";
+            //            echo "<br>";
+            //
+            //            if (!empty($_SESSION['semail'])) {
+            //                $sql = "SELECT courseId , discountId , status , verify FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND courseId = " . $_GET['id'] . " AND active = 1 AND (status = 1 OR status = 3)";
+            //                $result = mysqli_query($db, $sql);
+            //                if (mysqli_num_rows($result) > 0) {
+            //                    echo '<button id="removeBtn" class="btn btn-danger" name="remove" value="remove" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">حذف کلاس</button>';
+            //                    $res = mysqli_fetch_assoc($result);
+            //                    if ($res['status'] == 1 && $res['verify'] == 1)
+            //                        echo '<a href="card.php?id=' . $_GET['id'] . '" class="btn btn-success mr-1" role="button">دریافت کارت ورود به جلسه</a>';
+            //                } else {
+            //                    if (intval($remaining_cap) > 0)
+            //                        echo '<button id="submitBtn" class="btn btn-success" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">ثبت کلاس</button>';
+            //                    else
+            //                        echo '<button id="submitBtn" class="btn btn-warning" name="submit" value="submit" code="' . $discountCode . '" courseId="' . $_GET['id'] . '" email="' . $_SESSION['semail'] . '">رزرو</button>';
+            //
+            //                }
+            //            } else {
+            //                if (isset($_GET['reagent']) && !empty($_GET['reagent']))
+            //                    echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "&reagent=" . $_GET['reagent'] . "'>ثبت نام کنید</a>." . "</span>";
+            //                else
+            //                    echo "<span>" . "برای ثبت کلاس ابتدا باید " . "<a href='../login.php?id=" . $_GET['id'] . "'>وارد سایت شوید</a>" . ". اگر قبلا در سایت ثبت نام نکرده اید از این لینک " . "<a href='../signup.php?id=" . $_GET['id'] . "'>ثبت نام کنید</a>." . "</span>";
+            //
+            //            }
+            //
+            //            ?>
 
         </div>
 

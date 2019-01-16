@@ -7,7 +7,7 @@ if (!isset($_SESSION['semail']) || empty($_SESSION['semail']))
 $db = @mysqli_connect("localhost", "root", "", "ebbroker");
 if (!mysqli_connect_error()) {
     mysqli_query($db, "SET NAMES utf8");
-    $sql = "SELECT * FROM students WHERE email = '".$_SESSION['semail']."'";
+    $sql = "SELECT * FROM students WHERE email = '" . $_SESSION['semail'] . "'";
     $result = mysqli_query($db, $sql);
     $student = mysqli_fetch_assoc($result);
 
@@ -31,7 +31,7 @@ if (!mysqli_connect_error()) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../js/jquery.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
-    <script src="../js/stu-script.js"></script>
+    <script src="../js/script.js"></script>
 </head>
 <body dir="rtl">
 
@@ -100,62 +100,19 @@ if (!mysqli_connect_error()) {
             </div>
 
         </div>
-        <div class="col-lg-9">
-            <div style="position: relative ; height: 50px"><img style="position: absolute ; right: calc(50% - 77px) ; top: -100px !important; z-index: -100" src="../img/1.png" alt="آموزش"></div>
-            <h4 class="font-weight-bold text-center">جدید ترین دوره های آموزش و همایش های بورس</h4>
-            <div class="row intro-courses">
-
-                <?php
-
-                function getOffset()
-                {
-                    if (isset($_GET['page']) && !empty($_GET['page']) && $_GET['page'] > 0) {
-                        return ($_GET['page'] - 1) * 9;
-                    } else
-                        return 0;
-                }
-
-                function getSubmitCount($id, $db)
-                {
-                    $sql = "SELECT * FROM orders WHERE courseId = " . $id . " AND active = 1 AND status = 1";
-                    $result = mysqli_query($db, $sql);
-                    return mysqli_num_rows($result);
-                }
-
-                $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '".$_SESSION['semail']."' AND active = 1 AND (status = 1 OR status = 3) ) ORDER BY courseId DESC LIMIT 9 OFFSET " . getOffset();
-                $result = mysqli_query($db, $sql);
-
-                while ($r = mysqli_fetch_assoc($result)) {
-                    $s = "SELECT * FROM course INNER JOIN teachers ON teacherMail = email WHERE courseId = ".$r['courseId'];
-                    $res = mysqli_query($db, $s);
-                    $row = mysqli_fetch_assoc($res);
-
-                    echo '<div class="col-sm-12 col-md-6 col-lg-4">';
-                    if ($row['isVirtual']) echo '<div class="ribbon"><span>آنلاین</span></div>';
-                    echo '<div class="row intro-course shadow-bottom mb-2">';
-                    echo '<div class="col-sm-5 col-xs-12">';
-                    if ($row['image']==Null || $row['image']=='')
-                        echo '<img src="../img/teacher_av.png" alt="avatar"></div>';
-                    else
-                        echo '<img src="../'.$row['image'].'" alt="avatar"></div>';
-                    echo '<div class="col-sm-7 col-xs-12"> <div class="details">';
-                    echo '<div class="title">'.$row['title'].'</div>';
-                    echo '<div> <span>استاد: </span> <span>'.$row['name']." ".$row['family'].'</span> </div>';
-                    echo '<div> <span>تاریخ شروع: </span> <span>'.str_replace('-', '/', $row['startDate']).'</span> </div>';
-                    if ($row['cost']==NULL) echo '<div><span>هزینه دوره: </span><span class="txt-red"> رایگان</span></div>'; else echo '<div><span>هزینه دوره: </span>'.$row['cost'] .'ریال</div>';
-                    ($row['capacity'] == NULL) ? $remaining_cap = "نامحدود" : $remaining_cap = intval($row['capacity']) - intval(getSubmitCount($row['courseId'], $db));
-                    if ($remaining_cap == "0") $remaining_cap = "<span class='txt-red'>تکمیل</span>";
-                    echo '<div><span>ظرفیت باقی مانده: </span><span>' . $remaining_cap . '</span></div>';
-                    echo '<div><span>محل برگزاری: </span><span>تهران</span></div>';
-                    if ($remaining_cap && $remaining_cap != "<span class='txt-red'>تکمیل</span>")
-                        echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-submit">ثبت نام</a></div></div></div>';
-                    else
-                        echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-reserve">رزرو</a></div></div></div>';
-                }
-
-                ?>
+        <div class="col-lg-9 pos">
+            <div>
+                <br>
+                <h1>ارتباط با ما:</h1>
+                <br>
+                <h3>تلگرام : ebclub@</h3>
+                <br>
+                <h3>آموزش : 02142029550</h3>
+                <br>
+                <h3>تلفن همراه : 09204202900</h3>
+                <br>
+                <h3>مدیریت : 02142029520</h3>
             </div>
-
 
             <div class="row options">
                 <div class="col-md-2 col-sm-4 col-xs-6  text-center option">
@@ -191,17 +148,7 @@ if (!mysqli_connect_error()) {
                     </a>
                 </div>
             </div>
-
-
-            <?php
-            include("pager.php");
-            $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '".$_SESSION['semail']."' AND active = 1 AND status = 1)";
-            createPager($sql, $db);
-            ?>
-
-
         </div>
-
 
     </div>
 

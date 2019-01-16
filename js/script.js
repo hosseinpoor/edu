@@ -27,61 +27,79 @@ $(document).ready(function () {
     $('#submitBtn').click(function () {
         var courseId = $(this).attr("courseId");
         var studentMail = $(this).attr("email");
-        var c = "";
-        if ($('input[name=payType]:checked').val() == 'online') {
-            alert("این بخش در حال حاضر در دسترس نمی باشد");
-            return;
-        }
-        if ($(this).attr("code") == "") {
-            if (document.getElementById('discount') != null)
-                c = document.getElementById('discount').value;
+        var form_data = new FormData();
+        if(document.getElementsByClassName("free").length){
+            form_data.append('id', courseId);
+            form_data.append('mail', studentMail);
+            $.ajax({
+                url: '../student/add_course.php', // point to server-side PHP script
+                dataType: 'text',  // what to expect back from the PHP script, if anything
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (php_script_response) {
+                    alert(php_script_response); // display response from the PHP script, if any
+                    window.location.href = '../student/panel.php';
+                }
+            });
         }
         else {
-            c = $(this).attr("code");
-        }
-
-        var file_dis = "";
-        var file_res = "";
-
-        if ($('#receipt').prop('files')) {
-            if ($('#receipt').val() == "") {
-                alert("لطفا فیش واریز را آپلود کنید");
+            var c = "";
+            if ($('input[name=payType]:checked').val() == 'online') {
+                alert("این بخش در حال حاضر در دسترس نمی باشد");
                 return;
             }
-            else {
-                file_res = $('#receipt').prop('files')[0];
-            }
-        }
-
-        if ($('#neededFile').prop('files')) {
-            if ($('#needFile').val() == "") {
-                file_dis = "";
+            if (document.getElementById('discount').value) {
+                if (document.getElementById('discount') != null)
+                    c = document.getElementById('discount').value;
             }
             else {
-                file_dis = $('#neededFile').prop('files')[0];
+                c = $(this).attr("code");
             }
+
+            var file_dis = "";
+            var file_res = "";
+
+            if ($('#receipt').prop('files')) {
+                if ($('#receipt').val() == "") {
+                    alert("لطفا فیش واریز را آپلود کنید");
+                    return;
+                }
+                else {
+                    file_res = $('#receipt').prop('files')[0];
+                }
+            }
+
+            if ($('#neededFile').prop('files')) {
+                if ($('#needFile').val() == "") {
+                    file_dis = "";
+                }
+                else {
+                    file_dis = $('#neededFile').prop('files')[0];
+                }
+            }
+
+            form_data.append('disFile', file_dis);
+            form_data.append('resFile', file_res);
+            form_data.append('code', c);
+            form_data.append('id', courseId);
+            form_data.append('mail', studentMail);
+            $.ajax({
+                url: '../student/add_course.php', // point to server-side PHP script
+                dataType: 'text',  // what to expect back from the PHP script, if anything
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (php_script_response) {
+                    alert(php_script_response); // display response from the PHP script, if any
+                    window.location.href = '../student/panel.php';
+                }
+            });
         }
-
-
-        var form_data = new FormData();
-        form_data.append('disFile', file_dis);
-        form_data.append('resFile', file_res);
-        form_data.append('code', c);
-        form_data.append('id', courseId);
-        form_data.append('mail', studentMail);
-        $.ajax({
-            url: '../student/add_course.php', // point to server-side PHP script
-            dataType: 'text',  // what to expect back from the PHP script, if anything
-            cache: false,
-            contentType: false,
-            processData: false,
-            data: form_data,
-            type: 'post',
-            success: function (php_script_response) {
-                alert(php_script_response); // display response from the PHP script, if any
-                window.location.href = '../student/panel.php';
-            }
-        });
     });
 
     $('#discountCodeBtn').click(function () {
@@ -94,11 +112,12 @@ $(document).ready(function () {
             },
             function (data) {
                 if (parseInt(data)) {
-                    document.getElementById('finalCost').innerText = "هزینه با محاسبه تخفیف " + data.trim() + " ریال";
-                    document.getElementById('realCost').className = "invalid";
+                    document.getElementById('finalCost').style.display = "block";
+                    document.getElementById('finalCost').innerText =  data.trim() ;
+                    document.getElementById('realCost').className = "cost invalid";
                 }
                 else {
-                    alert('کد وارد شده معتبر نمی باشد');
+                    alert(data);
                 }
             });
 
@@ -119,8 +138,9 @@ $(document).ready(function () {
             },
             function (data) {
                 if (parseInt(data)) {
-                    document.getElementById('finalCost').innerText = "هزینه با محاسبه تخفیف " + data.trim() + " ریال";
-                    document.getElementById('realCost').className = "invalid";
+                    document.getElementById('finalCost').style.display = "block";
+                    document.getElementById('finalCost').innerText =  data.trim() ;
+                    document.getElementById('realCost').className = "cost invalid";
                 }
                 else {
                     alert('فایل ارسال شده معتبر نمی باشد');
@@ -208,10 +228,12 @@ $(document).ready(function () {
         if (this.value == 'none') {
             $('.needFile').hide();
             $('.needCode').hide();
+            $('#discount').val("");
         }
         else if (this.value == 'code') {
             $('.needFile').hide();
             $('.needCode').show();
+            $('#discount').val("");
         }
         else if (this.value == 'file') {
             $('.needFile').show();

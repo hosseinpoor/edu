@@ -122,7 +122,7 @@ if (!mysqli_connect_error()) {
                     return mysqli_num_rows($result);
                 }
 
-                $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '".$_SESSION['semail']."' AND active = 1 AND (status = 1 OR status = 3) ) ORDER BY courseId DESC LIMIT 9 OFFSET " . getOffset();
+                $sql = "SELECT courseId FROM course ORDER BY courseId DESC LIMIT 9 OFFSET " . getOffset();
                 $result = mysqli_query($db, $sql);
 
                 while ($r = mysqli_fetch_assoc($result)) {
@@ -147,10 +147,18 @@ if (!mysqli_connect_error()) {
                     if ($remaining_cap == "0") $remaining_cap = "<span class='txt-red'>تکمیل</span>";
                     echo '<div><span>ظرفیت باقی مانده: </span><span>' . $remaining_cap . '</span></div>';
                     echo '<div><span>محل برگزاری: </span><span>تهران</span></div>';
-                    if ($remaining_cap && $remaining_cap != "<span class='txt-red'>تکمیل</span>")
-                        echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-submit">ثبت نام</a></div></div></div>';
-                    else
-                        echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-reserve">رزرو</a></div></div></div>';
+
+                    $ss = "select orderId from orders where studentMail = '".$_SESSION['semail']."' and courseId = ".$r['courseId'];
+                    $rr = mysqli_query($db , $ss);
+                    if(mysqli_num_rows($rr)){
+                        echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-delete">حذف درس</a></div></div></div>';
+                    }
+                    else {
+                        if ($remaining_cap && $remaining_cap != "<span class='txt-red'>تکمیل</span>")
+                            echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-submit">ثبت نام</a></div></div></div>';
+                        else
+                            echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-reserve">رزرو</a></div></div></div>';
+                    }
                 }
 
                 ?>

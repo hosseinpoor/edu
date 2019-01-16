@@ -139,7 +139,12 @@ include("sidebar_teacher.php");
         </div>
         <div class="form-group">
             <label for="topicText">متن سرفصل : </label>
-            <textarea class="form-control" name="topicText" rows="3"><?php echo $topicText ?></textarea>
+            <textarea class="form-control" name="topicText" rows="3" required
+                      data-errormessage="این قسمت نمیتواند خالی باشد"
+            ><?php echo $topicText ?></textarea>
+            <script>
+                CKEDITOR.replace('topicText');
+            </script>
         </div>
         <div class="form-group">
             <label for="topicFile">فایل سرفصل : </label>

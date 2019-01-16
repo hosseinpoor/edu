@@ -90,7 +90,7 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
 
                 <?php
                 if ($student['image'] == "NULL" || $student['image'] == "")
-                    echo '<img src="../img/avatar.png" class="avatar" alt="avatar">';
+                    echo '<a href="panel.php"><img src="../img/avatar.png" class="avatar" alt="avatar"></a>';
                 else
                     echo '<img src="../' . $student['image'] . '" class="avatar" alt="avatar">';
                 ?>
@@ -102,28 +102,24 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
                             <img src="../img/envelope.png" alt="icon" class="side-icon">
                             پیام ها
                         </li>
-                        <li><a href="course_list.php">
-                                <img src="../img/overtime.png" alt="icon" class="side-icon">
-                                برنامه کلاس ها
-                            </a>
+                        <li>
+                            <img src="../img/overtime.png" alt="icon" class="side-icon">
+                            برنامه کلاس ها
                         </li>
                         <li><a href="finished_list.php">
                                 <img src="../img/finished.png" alt="icon" class="side-icon">
-                                دوره های پایان یافته
+                                دوره های پایان یافته من
                             </a>
                         </li>
-                        <li>
-                            <img src="../img/payments.png" alt="icon" class="side-icon">
-                            پرداخت ها
-
+                        <li><a href="course_list.php">
+                                <img src="../img/newcourse.png" alt="icon" class="side-icon">
+                                ثبت نام دوره جدید
+                            </a>
                         </li>
-                        <li>
-                            <img src="../img/newcourse.png" alt="icon" class="side-icon">
-                            ثبت نام دوره جدید
-                        </li>
-                        <li>
-                            <img src="../img/settings.png" alt="icon" class="side-icon">
-                            تنظیمات حساب کاربری
+                        <li><a href="conf.php">
+                                <img src="../img/settings.png" alt="icon" class="side-icon">
+                                تنظیمات حساب کاربری
+                            </a>
                         </li>
                         <li><a href="logout.php">
                                 <img src="../img/signout.png" alt="icon" class="side-icon">
@@ -159,7 +155,7 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
                     return mysqli_num_rows($result);
                 }
 
-                $sql = "SELECT courseId FROM course WHERE courseId NOT IN (SELECT courseId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1 AND (status = 1 OR status = 3)) ORDER BY courseId DESC ";
+                $sql = "SELECT courseId FROM course WHERE courseId IN (SELECT courseId FROM orders WHERE studentMail = '" . $_SESSION['semail'] . "' AND active = 1 AND status = 1) ORDER BY courseId DESC ";
                 $result = mysqli_query($db, $sql);
 
                 $today = date("Y-m-d");
@@ -193,12 +189,10 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
                         echo '<div> <span>تاریخ شروع: </span> <span>' . str_replace('-', '/', $row['startDate']) . '</span> </div>';
                         if ($row['cost'] == NULL) echo '<div><span>هزینه دوره: </span><span class="txt-red"> رایگان</span></div>'; else echo '<div><span>هزینه دوره: </span>' . $row['cost'] . 'ریال</div>';
                         ($row['capacity'] == NULL) ? $remaining_cap = "نامحدود" : $remaining_cap = intval($row['capacity']) - intval(getSubmitCount($row['courseId'], $db));
+                        if ($remaining_cap == "0") $remaining_cap = "<span class='txt-red'>تکمیل</span>";
                         echo '<div><span>ظرفیت باقی مانده: </span><span>' . $remaining_cap . '</span></div>';
                         echo '<div><span>محل برگزاری: </span><span>تهران</span></div>';
-                        if ($remaining_cap)
-                            echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-submit">ثبت نام</a></div></div></div>';
-                        else
-                            echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-reserve">رزرو</a></div></div></div>';
+                            echo '</div><a href="course.php?id=' . $row["courseId"] . '" class="intro-delete">حذف درس</a></div></div></div>';
                     }
                 }
 
@@ -207,18 +201,22 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
 
             <div class="row options">
                 <div class="col-md-2 col-sm-4 col-xs-6  text-center option">
-                    <a href="course_list.php">
+                    <a href="allcourse_list.php">
                         <img src="../img/course-list.png" alt="فهرست دوره ها">
                         <div>فهرست دوره ها</div>
                     </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
-                    <img src="../img/license.png" alt="گواهینامه ها">
-                    <div>گواهینامه ها</div>
+                    <a href="finished_list.php">
+                        <img src="../img/license.png" alt="گواهینامه ها">
+                        <div>گواهینامه ها</div>
+                    </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
+                    <a href="topics.php">
                     <img src="../img/topic.png" alt="سرفصل دوره ها">
                     <div>سرفصل دوره ها</div>
+                    </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
                     <img src="../img/viredu.png" alt="آموزش مجازی">
@@ -229,8 +227,10 @@ function jalali_to_gregorian($jy, $jm, $jd, $mod = '')
                     <div>مرکز دانلود</div>
                 </div>
                 <div class="col-md-2 col-sm-4 col-xs-6 text-center option">
-                    <img src="../img/support.png" alt="پشتیبانی">
-                    <div>پشتیبانی</div>
+                    <a href="contact.php">
+                        <img src="../img/support.png" alt="پشتیبانی">
+                        <div>پشتیبانی</div>
+                    </a>
                 </div>
             </div>
 
